@@ -18,4 +18,6 @@ Use PlatformIO to build & flash firmware
 
 ## Software
 
-//TODO: Create a client 
+Currently a python client exists to connect to the ESP32 via Bluetooth and receive data
+
+//TODO: Create a mobile client?
