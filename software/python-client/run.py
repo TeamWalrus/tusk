@@ -15,7 +15,6 @@ args = parser.parse_args()
 mac_hwaddr = args.hwaddr
 validate_mac(mac_hwaddr)
 
-
 port = 1 
 size = 1024
 logfile = open("card_data.txt", "a")
@@ -39,7 +38,7 @@ try:
         # so we wait until the length of the data is at least over 60 (which should* be all the card data)
         # TODO: better way to do this?
         if len(data) > 60:
-            logfile.write("[+]" + data.decode() + "\n")
+            logfile.write("[+] " + data.decode() + "\n")
             print(f"[+] {data.decode()}")
             data = b""
         
