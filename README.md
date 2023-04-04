@@ -1,7 +1,6 @@
 # Tusk
 
-This repo contains the hardware and software related to upgrades being made to the Tastic RFID Thief project. 
-
+This repo contains the hardware and software related to upgrades being made to the Tastic RFID Thief project.
 
 ## Hardware
 
@@ -11,20 +10,41 @@ PCB that houses the batteries for the long range reader, ESP32 microcontroller, 
 
 ### Firmware & Software
 
-- `/interface/` is the react frontend
-- `/data/` is build path of the react frontend
-- `/src/main.cpp`is the backend (webserver)
-- `/scripts/build_interface.py`is a helper script to build / deploy react webserver to `/data/` folder -> gzips the files 
+#### Overview of the project structure:
 
+```
+├── wifi
+│   ├── interface					# react frontend web application
+│   │   └── src
+│   ├── data						# build path of the react frontend
+│   ├── src							# backend webserver
+│   │   └── main.cpp
+│   ├── scripts
+│   │   └── build_interface.py		# helper script to build ahd deploy react webserver to /data/ folder
+```
 
-//TODO:
+#### Build and Deploy Instructions
+
+Use platformio to build and deploy the project.
+
+Build and upload the webserver
+
+<img src="images/build-main.png" width="250"">
+<img src="images/upload-main.png" width="250">
+
+Build and upload the react frontend 
+
+<img src="images/build-filesystem.png" width="250">
+<img src="images/upload-filesystem.png" width="250">
+
+#### TODO
 
 - add search / filter feature for card data
 - use websockets to update card data in less janky way (rather than read entire file everytime?)
-- Add code to handle card data coming from reader
-- Switch from writing card data to littlefs in frontend website partition to external sd card
-- Remove dummy data in `main.cpp`
-
+- add code to handle card data coming from reader
+- switch from writing card data to littlefs in frontend website partition to external sd card
+- remove dummy data in `main.cpp`
+- write Docs
 
 ## Bluetooth
 
@@ -32,11 +52,12 @@ PCB that houses the batteries for the long range reader, ESP32 microcontroller, 
 
 ESP32 firmware that handles card data coming from the reader and sends it over Bluetooth.
 
-Use PlatformIO to build & flash firmware
+Use PlatformIO to build & upload firmware
 
-//TODO: Add functions to write card data to sd-card as well
+#### TODO:
 
+- Add functions to write card data to sd-card as backup
 
 ### Software
 
-Basic python client to connect to tusk via bluetooth 
+Python client to connect to tusk via bluetooth
