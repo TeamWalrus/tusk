@@ -14,13 +14,13 @@ PCB that houses the batteries for the long range reader, ESP32 microcontroller, 
 
 ```
 ├── wifi
-│   ├── interface       # react frontend web application
+│   ├── interface               # react frontend web application
 │   │   └── src
-│   ├── data            # build path of the react frontend
-│   ├── src         # backend webserver
+│   ├── data                    # build path of the react frontend
+│   ├── src                     # backend webserver
 │   │   └── main.cpp
 │   ├── scripts
-│   │   └── build_interface.py          # helper script to build ahd deploy react webserver to /data/ folder
+│   │   └── build_interface.py  # helper script to build ahd deploy react webserver to /data/ folder
 ```
 
 #### Build and Deploy Instructions
