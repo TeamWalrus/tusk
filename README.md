@@ -29,13 +29,17 @@ Use platformio to build and deploy the project.
 
 Build and upload the webserver
 
-<img src="images/build-main.png" width="250"">
-<img src="images/upload-main.png" width="250">
+<p align="center">
+  <img width="40%" src="images/build-main.png" />
+  <img width="40%" src="images/upload-main.png" />
+</p>
 
-Build and upload the react frontend 
+Build and upload the react frontend
 
-<img src="images/build-filesystem.png" width="250">
-<img src="images/upload-filesystem.png" width="250">
+<p align="center">
+  <img width="40%" src="images/build-filesystem.png" />
+  <img width="40%" src="images/upload-filesystem.png" />
+</p>
 
 #### TODO
 
