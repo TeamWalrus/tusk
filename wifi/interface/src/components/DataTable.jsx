@@ -16,6 +16,8 @@ export default function DataTable() {
                 );
             }
             let cardData = await response.json();
+            // todo: remove logging after developement
+            console.log(cardData)
             setCardCata(cardData.entries);
             setError("");
         } catch(err) {
