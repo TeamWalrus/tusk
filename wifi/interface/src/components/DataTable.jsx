@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ndjsonStream from 'can-ndjson-stream';
 import Spinner from './Spinner';
 
 export default function DataTable() {
@@ -15,8 +16,16 @@ export default function DataTable() {
                 const message = `An error has occured: ${response.status}`;
                 throw new Error(message);
             }
-            let cardData = await response.json();
-            setCardCata(cardData.entries);
+            const dataReader = ndjsonStream(response.body).getReader();
+            // let cardData = await response.json();
+            // setCardCata(cardData.entries);
+            let result;
+            while (!result || !result.done) {
+                result = await dataReader.read();
+                console.log(result.done, result.value);
+                //setCardCata(cardData => cardData.concat(result.value));
+                //console.log(cardData);
+            }
             setError("");
         } catch(error) {
             setError(error.message);
