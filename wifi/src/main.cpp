@@ -751,7 +751,7 @@ void setup()
               }
               // Should we rather be streaming the json data?
               // AsyncResponseStream *response = request->beginResponseStream("application/json");
-              AsyncWebServerResponse *response = request->beginResponse(200, "application/x-ndjson", cardData);
+              AsyncWebServerResponse *response = request->beginResponse(200, "application/json", cardData);
               request->send(response); });
 
   server.onNotFound([](AsyncWebServerRequest *request)
