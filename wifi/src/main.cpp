@@ -520,44 +520,36 @@ void getCardValues()
 void writeSD()
 {
   // open file - note only one file can be open at a time
-  File SDFile = SD.open("/cards.json", FILE_APPEND);
+  File SDFile = SD.open("/cards.jsonl", FILE_APPEND);
   //  if file opens correctly, write to it
   if (SDFile)
   {
     if (bitCount >= 26)
     { // ignore data caused by noise
-      /*
-      SDFile.print(bitCount);
-      SDFile.print(" bit card (hex): ");
-      SDFile.print(cardChunk1, HEX);
-      SDFile.print(cardChunk2, HEX);
-      SDFile.print(", FC (dec) = ");
-      SDFile.print(facilityCode, DEC);
-      SDFile.print(", CC (dec) = ");
-      SDFile.print(cardCode, DEC);
-      SDFile.print(", BIN: ");
-      */
       DynamicJsonDocument doc(512);
-      JsonArray entries = doc.createNestedArray("entries");
-      JsonObject entry = entries.createNestedObject();
-      entry["bit_length"] = bitCount;
-      entry["facility_code"] = (facilityCode, DEC);
-      entry["card_number"] = (cardCode, DEC);
-      entry["hex"] = (cardChunk1, HEX) + (cardChunk2, HEX);
+      // JsonArray entries = doc.createNestedArray("entries");
+      // JsonObject entry = entries.createNestedObject();
+      doc["bit_length"] = bitCount;
+      doc["facility_code"] = (facilityCode, DEC);
+      doc["card_number"] = (cardCode, DEC);
+      doc["hex"] = (cardChunk1, HEX) + (cardChunk2, HEX);
+      String raw;
       for (int i = 19; i >= 0; i--)
       {
-        entry["raw"] = (bitRead(cardChunk1, i));
+        raw = (bitRead(cardChunk1, i));
       }
       for (int i = 23; i >= 0; i--)
       {
-        entry["raw"] = (bitRead(cardChunk2, i));
+        raw += (bitRead(cardChunk2, i));
       }
+      doc["raw"] = raw;
       if (serializeJson(doc, SDFile) == 0)
       {
 #ifdef VERBOSE
         Serial.println("[-] SD Card: Failed to write json card data to file");
 #endif
       }
+      SDFile.println();
       SDFile.close();
 #ifdef VERBOSE
       Serial.println("[+] SD Card: Data Written to SD Card");
@@ -612,19 +604,19 @@ void setup()
 #endif
   }
 
-  // Check for cards.json on SD card
+  // Check for cards.jsonl on SD card
   delay(3000);
-  if (!SD.exists("/cards.json"))
+  if (!SD.exists("/cards.jsonl"))
   {
 #ifdef VERBOSE
-    Serial.println("[-] SD Card: cards.json missing");
+    Serial.println("[-] SD Card: cards.jsonl missing");
     Serial.println("[-] SD Card: copy to SD card & Power Cycle");
 #endif
   }
   else
   {
 #ifdef VERBOSE
-    Serial.println("[+] SD Card: Found cards.json");
+    Serial.println("[+] SD Card: Found cards.jsonl");
 #endif
   }
 
@@ -709,7 +701,7 @@ void setup()
 
   /* #####----- Dummy card data for testing -----##### */
   /*
-  File dummycarddata = LittleFS.open("/cards.json", "w");
+  File dummycarddata = LittleFS.open("/cards.jsonl", "w");
   StaticJsonDocument<512> doc;
   JsonArray entries = doc.createNestedArray("entries");
 
@@ -736,10 +728,9 @@ void setup()
   dummycarddata.close();
    */
 
-  // TODO get card data from file on SD card instead
   server.on("/api/carddata", HTTP_GET, [](AsyncWebServerRequest *request)
             {
-              File SDFile = SD.open("/cards.json", FILE_READ);
+              File SDFile = SD.open("/cards.jsonl", FILE_READ);
               String cardData;
               if (SDFile)
               {
@@ -747,17 +738,20 @@ void setup()
                 {
                   cardData = SDFile.readString();
                 }
+#ifdef VERBOSE
+                Serial.println(cardData);
+#endif
                 SDFile.close();
               }
               else
               {
 #ifdef VERBOSE
-                Serial.println("[-] SD Card: error opening json.data");
+                Serial.println("[-] SD Card: error opening json data");
 #endif
               }
               // Should we rather be streaming the json data?
               // AsyncResponseStream *response = request->beginResponseStream("application/json");
-              AsyncWebServerResponse *response = request->beginResponse(200, "application/json", cardData);
+              AsyncWebServerResponse *response = request->beginResponse(200, "application/x-ndjson", cardData);
               request->send(response); });
 
   server.onNotFound([](AsyncWebServerRequest *request)

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Readable from 'stream';
 import Spinner from './Spinner';
 
 export default function DataTable() {
@@ -7,22 +8,27 @@ export default function DataTable() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
 
+
     const getCardData = async () => {
         try {
             const response = await fetch("/api/carddata");
             if (!response.ok) {
-                throw new Error(
-                `This is an HTTP error: The status is ${response.status}`
-                );
+                const message = `An error has occured: ${response.status}`;
+                throw new Error(message);
             }
-            let cardData = await response.json();
-            // todo: remove logging after developement
-            console.log(cardData)
-            setCardCata(cardData.entries);
+            // let cardData = await response.json();
+            // setCardCata(cardData.entries);
+            let cardData = await response.text();
+            //console.log(cardData);
+            const readable = Readable.from([cardData]);
+            console.log(readable);
+            readable.on("data", (chunk) => {
+                    console.log(chunk)
+                })
             setError("");
-        } catch(err) {
-            setError(err.message);
-            console.log(err.message)
+        } catch(error) {
+            setError(error.message);
+            console.log(error.message);
         } finally {
             setIsLoading(false);
         }  
