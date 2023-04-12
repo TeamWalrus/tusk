@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Readable from 'stream';
 import Spinner from './Spinner';
 
 export default function DataTable() {
@@ -16,15 +15,8 @@ export default function DataTable() {
                 const message = `An error has occured: ${response.status}`;
                 throw new Error(message);
             }
-            // let cardData = await response.json();
-            // setCardCata(cardData.entries);
-            let cardData = await response.text();
-            //console.log(cardData);
-            const readable = Readable.from([cardData]);
-            console.log(readable);
-            readable.on("data", (chunk) => {
-                    console.log(chunk)
-                })
+            let cardData = await response.json();
+            setCardCata(cardData.entries);
             setError("");
         } catch(error) {
             setError(error.message);

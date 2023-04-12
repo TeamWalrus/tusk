@@ -520,7 +520,7 @@ void getCardValues()
 void writeSD()
 {
   // open file - note only one file can be open at a time
-  File SDFile = SD.open("/cards.jsonl", FILE_APPEND);
+  File SDFile = SD.open("/cards.json", FILE_APPEND);
   //  if file opens correctly, write to it
   if (SDFile)
   {
@@ -604,19 +604,19 @@ void setup()
 #endif
   }
 
-  // Check for cards.jsonl on SD card
+  // Check for cards.json on SD card
   delay(3000);
-  if (!SD.exists("/cards.jsonl"))
+  if (!SD.exists("/cards.json"))
   {
 #ifdef VERBOSE
-    Serial.println("[-] SD Card: cards.jsonl missing");
+    Serial.println("[-] SD Card: cards.json missing");
     Serial.println("[-] SD Card: copy to SD card & Power Cycle");
 #endif
   }
   else
   {
 #ifdef VERBOSE
-    Serial.println("[+] SD Card: Found cards.jsonl");
+    Serial.println("[+] SD Card: Found cards.json");
 #endif
   }
 
@@ -701,7 +701,7 @@ void setup()
 
   /* #####----- Dummy card data for testing -----##### */
   /*
-  File dummycarddata = LittleFS.open("/cards.jsonl", "w");
+  File dummycarddata = LittleFS.open("/cards.json", "w");
   StaticJsonDocument<512> doc;
   JsonArray entries = doc.createNestedArray("entries");
 
@@ -730,7 +730,7 @@ void setup()
 
   server.on("/api/carddata", HTTP_GET, [](AsyncWebServerRequest *request)
             {
-              File SDFile = SD.open("/cards.jsonl", FILE_READ);
+              File SDFile = SD.open("/cards.json", FILE_READ);
               String cardData;
               if (SDFile)
               {
