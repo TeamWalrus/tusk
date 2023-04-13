@@ -10,7 +10,7 @@
 // #include "wsEventHandler.h"
 
 // Uncomment for debugging / verbose messages
-#define VERBOSE
+// #define VERBOSE
 
 /* #####----- WiFi SoftAP config -----##### */
 #define ssid "Tusk"         // This is the SSID that ESP32 will broadcast
@@ -527,8 +527,6 @@ void writeSD()
     if (bitCount >= 26)
     { // ignore data caused by noise
       DynamicJsonDocument doc(512);
-      // JsonArray entries = doc.createNestedArray("entries");
-      // JsonObject entry = entries.createNestedObject();
       doc["bit_length"] = bitCount;
       doc["facility_code"] = (facilityCode, DEC);
       doc["card_number"] = (cardCode, DEC);
@@ -609,8 +607,8 @@ void setup()
   if (!SD.exists("/cards.jsonl"))
   {
 #ifdef VERBOSE
-    Serial.println("[-] SD Card: cards.jsonl missing");
-    Serial.println("[-] SD Card: copy to SD card & Power Cycle");
+    Serial.println("[-] SD Card: File cards.jsonl missing");
+    Serial.println("[-] SD Card: Copy to SD card & Power Cycle");
 #endif
   }
   else
@@ -698,35 +696,6 @@ void setup()
               json["usedBytes"] = LittleFS.usedBytes();
               serializeJson(json, *response);
               request->send(response); });
-
-  /* #####----- Dummy card data for testing -----##### */
-  /*
-  File dummycarddata = LittleFS.open("/cards.jsonl", "w");
-  StaticJsonDocument<512> doc;
-  JsonArray entries = doc.createNestedArray("entries");
-
-  JsonObject entries_0 = entries.createNestedObject();
-  entries_0["id"] = "1";
-  entries_0["bit_length"] = "26";
-  entries_0["facility_code"] = "123";
-  entries_0["card_number"] = "57273";
-  entries_0["hex"] = "AAAAAAA";
-  entries_0["raw"] = "0000101101001010111111";
-
-  JsonObject entries_1 = entries.createNestedObject();
-  entries_1["id"] = "2";
-  entries_1["bit_length"] = "34";
-  entries_1["facility_code"] = "987";
-  entries_1["card_number"] = "121212";
-  entries_1["hex"] = "FFFFFFF";
-  entries_1["raw"] = "0000101101001010111111";
-
-  if (serializeJson(doc, dummycarddata) == 0)
-  {
-    Serial.println(F("Failed to write to file"));
-  }
-  dummycarddata.close();
-   */
 
   server.on("/api/carddata", HTTP_GET, [](AsyncWebServerRequest *request)
             {
