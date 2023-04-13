@@ -41,14 +41,23 @@ Build and upload the react frontend
   <img width="40%" src="images/upload-filesystem.png" />
 </p>
 
+#### Sample cards.jsonl file for testing (write to sd card)
+
+Dummy data in `cards.jsonl` file:
+
+```
+{"bit_length":462,"facility_code":123,"card_number":123123,"hex":"AAAAAAA","raw":"0010101010010011000101010"}
+{"bit_length":418,"facility_code":555,"card_number":678678,"hex":"FFFFFFF","raw":"0000000000000000000000000"}
+```
+
 #### TODO
 
-- add search / filter feature for card data
-- use websockets to update card data in less janky way (rather than read entire file everytime?)
-- add code to handle card data coming from reader
-- switch from writing card data to littlefs in frontend website partition to external sd card
-- remove dummy data in `main.cpp`
-- write Docs
+- WebApp: add search / filter feature for card data
+- WebApp: use websockets to update card data in less janky way (rather than read entire file everytime?)
+- WebApp: test code that handles saving card data to cards.jsonl file on sd card
+- Hardware: remove trace connecting esp32 GND pins
+- Hardware: move SD card so not obstructing usb for debugging
+- General: write Docs
 
 ## Bluetooth
 
