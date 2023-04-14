@@ -7,7 +7,6 @@
 #include <ESPAsyncWebServer.h>
 #include "AsyncJson.h"
 #include "ArduinoJson.h"
-// #include "wsEventHandler.h"
 
 // Uncomment for debugging / verbose messages
 // #define VERBOSE
@@ -26,7 +25,6 @@ const IPAddress subnet(255, 255, 255, 0);
 /* #####----- Webserver and DNS config -----##### */
 DNSServer dnsServer;
 AsyncWebServer server(80);
-// AsyncWebSocket websocket("/ws");
 
 /* #####----- Card Reader Config -----##### */
 // Card Reader variables
@@ -547,7 +545,7 @@ void writeSD()
         Serial.println("[-] SD Card: Failed to write json card data to file");
 #endif
       }
-      SDFile.println();
+      SDFile.print("\n");
       SDFile.close();
 #ifdef VERBOSE
       Serial.println("[+] SD Card: Data Written to SD Card");
@@ -632,10 +630,6 @@ void setup()
 #endif
   }
 
-  // bind websocket to async web server
-  // websocket.onEvent(wsEventHandler);
-  // server.addHandler(&websocket);
-
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
             {
 #ifdef VERBOSE
@@ -686,14 +680,19 @@ void setup()
 
   server.on("/api/littlefsinfo", HTTP_GET, [](AsyncWebServerRequest *request)
             {
-              // Get LittleFS info
-              unsigned int totalBytes = LittleFS.totalBytes();
-              unsigned int usedBytes = LittleFS.usedBytes();
-
               AsyncResponseStream *response = request->beginResponseStream("application/json");
               DynamicJsonDocument json(512);
               json["totalBytes"] = LittleFS.totalBytes();
               json["usedBytes"] = LittleFS.usedBytes();
+              serializeJson(json, *response);
+              request->send(response); });
+
+  server.on("/api/sdcardinfo", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+              AsyncResponseStream *response = request->beginResponseStream("application/json");
+              DynamicJsonDocument json(512);
+              json["totalBytes"] = SD.totalBytes();
+              json["usedBytes"] = SD.usedBytes();
               serializeJson(json, *response);
               request->send(response); });
 
