@@ -605,9 +605,19 @@ void setup()
   if (!SD.exists("/cards.jsonl"))
   {
 #ifdef VERBOSE
-    Serial.println("[-] SD Card: File cards.jsonl missing");
-    Serial.println("[-] SD Card: Copy to SD card & Power Cycle");
+    Serial.println("[-] SD Card: File cards.jsonl not found");
+    Serial.println("[*] SD Card: Created cards.jsonl and performing software reset");
 #endif
+    // If file doesn't exist, create it
+    File file = SD.open("/cards.jsonl", FILE_WRITE);
+    file.println();
+    file.close();
+#ifdef VERBOSE
+    Serial.println("[+] SD Card: File cards.jsonl created");
+    Serial.println("[*] SD Card: Rebooting...");
+#endif
+    delay(5000);
+    ESP.restart();
   }
   else
   {
