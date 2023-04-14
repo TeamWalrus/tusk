@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import formatBytes from "../components/FormatBytes";
 
 export default function Settings() {
 
@@ -33,34 +34,37 @@ export default function Settings() {
         getSDCardInfo();
     }, [])
 
-
+    const prettylittlefsinfototal = formatBytes(littlefsinfo.totalBytes);
+    const prettylittlefsinfoused = formatBytes(littlefsinfo.usedBytes);
     const renderLittleFSInfo = (
         <div className="container">
             <h4>ESP32 LittleFS Info:</h4>
             <div className="stats shadow">
                 <div className="stat place-items-center ">
                     <div className="stat-title text-info font-semibold">Total</div>
-                    <div className="stat-value">{littlefsinfo.totalBytes} bytes</div>
+                    <div className="stat-value">{prettylittlefsinfototal}</div>
                 </div>
                 <div className="stat place-items-center">
                     <div className="stat-title text-warning font-semibold">Used</div>
-                    <div className="stat-value">{littlefsinfo.usedBytes} bytes</div>
+                    <div className="stat-value">{prettylittlefsinfoused}</div>
                 </div>
             </div>
         </div>
     );
 
+    const prettysdcardinfototal = formatBytes(sdcardinfo.totalBytes);
+    const prettysdcardinfoused = formatBytes(sdcardinfo.usedBytes);
     const renderSDCardInfo = (
         <div className="container">
             <h4>SD Card Info:</h4>
             <div className="stats shadow">
                 <div className="stat place-items-center ">
                     <div className="stat-title text-info font-semibold">Total</div>
-                    <div className="stat-value">{sdcardinfo.totalBytes} bytes</div>
+                    <div className="stat-value">{prettysdcardinfototal}</div>
                 </div>
                 <div className="stat place-items-center">
                     <div className="stat-title text-warning font-semibold">Used</div>
-                    <div className="stat-value">{sdcardinfo.usedBytes} bytes</div>
+                    <div className="stat-value">{prettysdcardinfoused}</div>
                 </div>
             </div>
         </div>
