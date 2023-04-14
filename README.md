@@ -50,13 +50,6 @@ Dummy data in `cards.jsonl` file:
 {"bit_length":418,"facility_code":555,"card_number":678678,"hex":"FFFFFFF","raw":"0000000000000000000000000"}
 ```
 
-#### TODO
-
-- WebApp: add search / filter feature for card data
-- WebApp: use websockets to update card data in less janky way (rather than read entire file everytime?)
-- WebApp: test code that handles saving card data to cards.jsonl file on sd card
-- General: write Docs
-
 ## Bluetooth
 
 ### Firmware
