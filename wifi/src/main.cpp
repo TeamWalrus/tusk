@@ -610,7 +610,7 @@ void setup()
 #endif
     // If file doesn't exist, create it
     File file = SD.open("/cards.jsonl", FILE_WRITE);
-    file.println();
+    file.print("");
     file.close();
 #ifdef VERBOSE
     Serial.println("[+] SD Card: File cards.jsonl created");
@@ -739,7 +739,10 @@ void setup()
             { request->redirect("http://" + local_ip.toString()); });
 
   server.begin();
+#ifdef VERBOSE
   Serial.println("[+] Webserver: Started");
+#endif
+  Serial.println("[*] Tusk is running");
 }
 
 void loop()

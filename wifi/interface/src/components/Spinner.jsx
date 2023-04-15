@@ -7,5 +7,5 @@ export default function Spinner() {
             </div>
             Fetching card data...
         </div>
-    )
+    );
 }

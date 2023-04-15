@@ -28,7 +28,7 @@ export default function DataTable() {
                     return cardEntry;
                 }
                 cardEntry.push(value);
-                return reader.read().then(processValue, streamerr);
+                return reader.read().then({ processValue, streamerr });
                 }, streamerr)
                 .then(data => {
                 setCardCata([...cardData, ...cardEntry]);
@@ -48,8 +48,6 @@ export default function DataTable() {
             clearInterval(intervalCall);
         };
     }, []);
-
-
 
     const renderCardData = (
         <div className='overflow-x-auto'>
