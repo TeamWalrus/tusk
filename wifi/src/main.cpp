@@ -2,7 +2,6 @@
 #include <SD.h>
 #include <SPI.h>
 #include <WiFi.h>
-#include <DNSServer.h>
 #include <LittleFS.h>
 #include <ESPAsyncWebServer.h>
 #include "AsyncJson.h"
@@ -11,10 +10,9 @@
 // Uncomment for debugging / verbose messages
 // #define VERBOSE
 
-/* #####----- WiFi SoftAP config -----##### */
-#define ssid "Tusk"         // This is the SSID that ESP32 will broadcast
+// WiFi SoftAP config
+#define ssid "Tusk"
 #define password "12345678" // password should be atleast 8 characters to make it work
-#define dns_port 53
 const IPAddress local_ip(192, 168, 100, 1);
 const IPAddress gateway(192, 168, 100, 1);
 const IPAddress subnet(255, 255, 255, 0);
@@ -22,8 +20,7 @@ const IPAddress subnet(255, 255, 255, 0);
 // Define CS pin for the SD card module
 #define sd_cs 5
 
-/* #####----- Webserver and DNS config -----##### */
-DNSServer dnsServer;
+// Webserver config /
 AsyncWebServer server(80);
 
 /* #####----- Card Reader Config -----##### */
@@ -563,7 +560,6 @@ void setup()
   WiFi.mode(WIFI_AP);
   WiFi.softAPConfig(local_ip, gateway, subnet);
   WiFi.softAP(ssid, password);
-  dnsServer.start(dns_port, "*", local_ip);
 
 #ifdef VERBOSE
   Serial.println("\n[*] WiFi: Creating ESP32 Access Point");
@@ -754,9 +750,6 @@ void setup()
 
 void loop()
 {
-  dnsServer.processNextRequest();
-  vTaskDelay(1);
-
   if (!flagDone)
   {
     if (--weigand_counter == 0)
