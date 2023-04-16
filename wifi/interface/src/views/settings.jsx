@@ -29,6 +29,18 @@ export default function Settings() {
             });
     }
 
+    const deleteCardData = async () => {
+       fetch('/api/delete/carddata')
+           .then((response) => response.text())
+           .then((message) => {
+               console.log(message);
+               alert(message);
+           })
+           .catch((error) => {
+               setError(error);
+           });
+   }
+
     useEffect(() => {
         getLittleFSInfo();
         getSDCardInfo();
@@ -90,6 +102,10 @@ export default function Settings() {
                     {littlefsinfo && renderLittleFSInfo}
                     {sdcardinfo && renderSDCardInfo}
                     {error && renderError}
+                    <div className='container pt-6'>
+                        <button className='btn btn-error' onClick={() => { window.confirm( 'Are you sure you want to delete all card data?', ) && deleteCardData() }}>Delete All Card Data</button>
+                        
+                    </div>    
                 </article>
             </div>
         </div>

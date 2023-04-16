@@ -732,6 +732,13 @@ void setup()
               AsyncWebServerResponse *response = request->beginResponse(200, "application/x-ndjson", cardData);
               request->send(response); });
 
+  server.on("/api/delete/carddata", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+             File file = SD.open("/cards.jsonl", FILE_WRITE);
+             file.print("");
+             file.close();
+             request->send(200, "text/plain", "All card data deleted!"); });
+
   server.onNotFound([](AsyncWebServerRequest *request)
                     { request->send(404); });
 
