@@ -50,7 +50,6 @@ volatile unsigned long cardChunk2 = 0;
 // interrupt that happens when INT0 goes low (0 bit)
 void ISR_INT0()
 {
-  // Serial.print("0");
   bitCount++;
   flagDone = 0;
 
@@ -68,7 +67,6 @@ void ISR_INT0()
 // interrupt that happens when INT1 goes low (1 bit)
 void ISR_INT1()
 {
-  // Serial.print("1");
   databits[bitCount] = 1;
   bitCount++;
   flagDone = 0;
