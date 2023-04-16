@@ -90,13 +90,10 @@ void printBits()
 {
   if (bitCount >= 26)
   { // ignore data caused by noise
-    Serial.print(bitCount);
-    Serial.print(" bit card. ");
-    Serial.print("FC = ");
-    Serial.print(facilityCode);
-    Serial.print(", CC = ");
-    Serial.print(cardCode);
-    Serial.print(", 44bit HEX = ");
+    Serial.println("bit length: " + bitCount);
+    Serial.println("facility code: " + facilityCode);
+    Serial.println("card number: " + cardCode);
+    Serial.print("Hex: ");
     Serial.print(cardChunk1, HEX);
     Serial.println(cardChunk2, HEX);
   }
@@ -512,18 +509,17 @@ void getCardValues()
 /* #####----- Write to SD card -----##### */
 void writeSD()
 {
-  // open file - note only one file can be open at a time
   File SDFile = SD.open("/cards.jsonl", FILE_APPEND);
-  //  if file opens correctly, write to it
   if (SDFile)
   {
     if (bitCount >= 26)
     { // ignore data caused by noise
       DynamicJsonDocument doc(512);
       doc["bit_length"] = bitCount;
-      doc["facility_code"] = (facilityCode, DEC);
-      doc["card_number"] = (cardCode, DEC);
-      doc["hex"] = (cardChunk1, HEX) + (cardChunk2, HEX);
+      doc["facility_code"] = facilityCode;
+      doc["card_number"] = cardCode;
+      String hex = String(cardChunk1, HEX) + String(cardChunk2, HEX); 
+      doc["hex"] = hex;
       String raw;
       for (int i = 19; i >= 0; i--)
       {
@@ -534,6 +530,10 @@ void writeSD()
         raw += (bitRead(cardChunk2, i));
       }
       doc["raw"] = raw;
+#ifdef VERBOSE
+      Serial.println("[+] New Card Read:");
+      serializeJsonPretty(doc, Serial);
+#endif
       if (serializeJson(doc, SDFile) == 0)
       {
 #ifdef VERBOSE
@@ -561,8 +561,7 @@ void setup()
 
 #ifdef VERBOSE
   Serial.println("\n[*] WiFi: Creating ESP32 Access Point");
-  Serial.print("[+] WiFi: Access Point created with IP Gateway ");
-  Serial.println(local_ip);
+  Serial.println("[+] WiFi: Access Point created with IP Gateway: " + local_ip);
 #endif
 
   // set tx/rx pins for card reader
@@ -710,9 +709,6 @@ void setup()
                 {
                   cardData = SDFile.readString();
                 }
-#ifdef VERBOSE
-                Serial.println(cardData);
-#endif
                 SDFile.close();
               }
               else
@@ -736,8 +732,8 @@ void setup()
   server.onNotFound([](AsyncWebServerRequest *request)
                     { request->send(404); });
 
-  server.on("*", HTTP_GET, [](AsyncWebServerRequest *request)
-            { request->redirect("http://" + local_ip.toString()); });
+  //server.on("*", HTTP_GET, [](AsyncWebServerRequest *request)
+  //          { request->redirect("http://" + local_ip.toString()); });
 
   server.begin();
 #ifdef VERBOSE
