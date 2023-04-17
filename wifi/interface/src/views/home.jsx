@@ -17,7 +17,7 @@ export default function Home() {
                         <input type='text' className='input input-bordered input-primary' placeholder='Search' value={filter} onChange={event => setFilter(event.target.value)} />
                     </div>
                 </div>
-                <DataTable /> 
+                <DataTable filter={filter}/> 
             </div>
         </div>
         );

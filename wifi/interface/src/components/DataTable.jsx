@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ndjsonStream from 'can-ndjson-stream';
 import Spinner from './Spinner';
 
-export default function DataTable() {
+export default function DataTable({filter}) {
 
     const [cardData, setCardCata] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -28,7 +28,7 @@ export default function DataTable() {
                     return cardEntry;
                 }
                 cardEntry.push(value);
-                return reader.read().then({ processValue, streamerr });
+                return reader.read().then(processValue, streamerr);
                 }, streamerr)
                 .then(data => {
                 setCardCata([...cardData, ...cardEntry]);
@@ -48,6 +48,8 @@ export default function DataTable() {
             clearInterval(intervalCall);
         };
     }, []);
+
+    console.log({filter});
 
     const renderCardData = (
         <div className='overflow-x-auto'>
@@ -110,3 +112,4 @@ export default function DataTable() {
         </div>
   )
 }
+                    
