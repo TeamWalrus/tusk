@@ -14,7 +14,7 @@ export default function Home() {
                     </article>
                     <div className='divider divider-horizontal'></div>
                     <div className='form-control'>
-                        <input type='text' className='input input-bordered input-primary' placeholder='Search' value={filter} onChange={event => setFilter(event.target.value)} />
+                        <input type='text' className='input input-bordered input-primary' placeholder='Search Card Number' value={filter} onChange={event => setFilter(event.target.value)} />
                     </div>
                 </div>
                 <DataTable filter={filter}/> 

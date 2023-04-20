@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo} from 'react';
 import ndjsonStream from 'can-ndjson-stream';
 import Spinner from './Spinner';
 
@@ -49,7 +49,13 @@ export default function DataTable({filter}) {
         };
     }, []);
 
-    console.log({filter});
+    
+    const filteredCardData = useMemo(
+        () => 
+            cardData.filter(card => {
+                return card.card_number.toString().includes(Object.values({filter}));
+            })
+        );
 
     const renderCardData = (
         <div className='overflow-x-auto'>
@@ -64,13 +70,13 @@ export default function DataTable({filter}) {
                     </tr>
                 </thead>
                 <tbody>
-                    {cardData.map(cardData => (
+                    {filteredCardData.map(item => (
                     <tr>
-                        <td>{cardData.bit_length}</td>
-                        <td>{cardData.facility_code}</td>
-                        <td>{cardData.card_number}</td>
-                        <td>{cardData.hex}</td>
-                        <td>{cardData.raw}</td>
+                        <td>{item.bit_length}</td>
+                        <td>{item.facility_code}</td>
+                        <td>{item.card_number}</td>
+                        <td>{item.hex}</td>
+                        <td>{item.raw}</td>
                     </tr>
                     ))}
                 </tbody>
