@@ -23,24 +23,6 @@ PCB that houses the batteries for the long range reader, ESP32 microcontroller, 
 │   │   └── build_interface.py  # helper script to build ahd deploy react webserver to /data/ folder
 ```
 
-#### Build and Deploy Instructions
-
-Use platformio to build and deploy the project.
-
-Build and upload the webserver
-
-<p align="center">
-  <img width="40%" src="images/build-main.png" />
-  <img width="40%" src="images/upload-main.png" />
-</p>
-
-Build and upload the react frontend
-
-<p align="center">
-  <img width="40%" src="images/build-filesystem.png" />
-  <img width="40%" src="images/upload-filesystem.png" />
-</p>
-
 #### Sample cards.jsonl file for testing (write to sd card)
 
 Dummy data in `cards.jsonl` file:
