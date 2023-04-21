@@ -9,7 +9,7 @@ export default function DataTable({filter}) {
     const [error, setError] = useState('');
 
     const streamerr = e => {
-        setError(e);
+        setError(e.message);
     }
 
     const getCardData = async () => {
@@ -35,7 +35,7 @@ export default function DataTable({filter}) {
                 });
             })
             .catch(error => {
-                setError(error);
+                setError(error.message);
             });
         setIsLoading(false);
     }
