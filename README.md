@@ -8,6 +8,8 @@ PCB that houses the batteries for the long range reader, ESP32 microcontroller, 
 
 ## WiFi
 
+This is the WiFi "version" of tusk. Client connects to ESP32 over wifi and views card data via react web application.
+
 ### Firmware & Software
 
 #### Overview of the project structure:
@@ -33,6 +35,8 @@ Dummy data in `cards.jsonl` file:
 ```
 
 ## Bluetooth
+
+This is the Bluetooth "version" of tusk. Client connects to ESP32 over Bluetooth and uses a python script to stream card reads (very simple). Unlikely this will progress much futher.
 
 ### Firmware
 
