@@ -12,7 +12,7 @@
 
 // WiFi SoftAP config
 #define ssid "Tusk"
-#define password "12345678" // password should be atleast 8 characters to make it work
+#define password "12345678"
 const IPAddress local_ip(192, 168, 100, 1);
 const IPAddress gateway(192, 168, 100, 1);
 const IPAddress subnet(255, 255, 255, 0);
@@ -518,7 +518,7 @@ void writeSD()
       doc["bit_length"] = bitCount;
       doc["facility_code"] = facilityCode;
       doc["card_number"] = cardCode;
-      String hex = String(cardChunk1, HEX) + String(cardChunk2, HEX); 
+      String hex = String(cardChunk1, HEX) + String(cardChunk2, HEX);
       doc["hex"] = hex;
       String raw;
       for (int i = 19; i >= 0; i--)
@@ -732,8 +732,8 @@ void setup()
   server.onNotFound([](AsyncWebServerRequest *request)
                     { request->send(404); });
 
-  //server.on("*", HTTP_GET, [](AsyncWebServerRequest *request)
-  //          { request->redirect("http://" + local_ip.toString()); });
+  // server.on("*", HTTP_GET, [](AsyncWebServerRequest *request)
+  //           { request->redirect("http://" + local_ip.toString()); });
 
   server.begin();
 #ifdef VERBOSE

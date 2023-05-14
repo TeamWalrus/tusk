@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import tuskLogo from '../assets/logo.png';
 
 export default function NavBar() {
 
@@ -42,6 +43,7 @@ export default function NavBar() {
                     </div>
                 </div>
                 <div className='navbar-center'>
+                    <img className='h-auto w-20' src={tuskLogo} alt='tusk logo'/>
                     <a className='btn btn-ghost normal-case text-xl'>Tusk</a>
                 </div>
                 <div className='navbar-end'>
