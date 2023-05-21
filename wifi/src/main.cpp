@@ -11,14 +11,17 @@
 // #define VERBOSE
 
 // WiFi SoftAP config
-#define ssid "Tusk"
-#define password "12345678"
-const IPAddress local_ip(192, 168, 100, 1);
-const IPAddress gateway(192, 168, 100, 1);
-const IPAddress subnet(255, 255, 255, 0);
+const char *ssid = "Tusk";
+const char *password = "12345678";
+int wifi_channel = 1;
+// 0 = broadcast SSID, 1 = hide SSID
+int wifi_hidden = 0;
+IPAddress local_ip(192, 168, 100, 1);
+IPAddress gateway(192, 168, 100, 1);
+IPAddress subnet(255, 255, 255, 0);
 
 // Define CS pin for the SD card module
-#define sd_cs 5
+const int sd_cs = 5;
 
 // Webserver config /
 AsyncWebServer server(80);
@@ -557,7 +560,7 @@ void setup()
   WiFi.mode(WIFI_OFF);
   WiFi.mode(WIFI_AP);
   WiFi.softAPConfig(local_ip, gateway, subnet);
-  WiFi.softAP(ssid, password);
+  WiFi.softAP(ssid, password, wifi_channel, wifi_hidden);
 
 #ifdef VERBOSE
   Serial.println("\n[*] WiFi: Creating ESP32 Access Point");

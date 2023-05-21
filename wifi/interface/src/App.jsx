@@ -1,7 +1,7 @@
 import { Link, Route } from "wouter";
 import NavBar from "./components/NavBar"
-import Home from "./views/home"
-import Settings from "./views/settings"
+import Home from "./views/Home"
+import Settings from "./views/Settings"
 import './App.css'
 
 function App() {
