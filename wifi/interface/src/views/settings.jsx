@@ -116,36 +116,36 @@ export default function Settings() {
                   }}>LittleFS Info</a> 
             </div>
             <div className='tabscontent pt-6'>
-              <div id='tab1_content' className={openTab === 1 ? 'block' : 'hidden'}>
-                <form>
+              <div id='tab_wificonfig' className={openTab === 1 ? 'block' : 'hidden'}>
+                <form action='/wificonfig/update' method='POST'>
                     <div className='form-control w-full max-w-xs'>
                     <label className='label'>
                         <span className='label-text'>Name (SSID)</span>
                     </label>
-                    <input id='ssid' type='text' placeholder='Tusk' className='input input-bordered input-primary w-full max-w-xs' />
+                    <input id='ssid' name='ssid' type='text' placeholder='Tusk' defaultValue='Tusk' required className='input input-bordered input-primary w-full max-w-xs' />
                     <label className='label'>
                         <span className='label-text'>Password</span>
                     </label>
-                    <input id='password' type='password' placeholder='********' minLength={8} className='input input-bordered input-primary w-full max-w-xs' />
+                    <input id='password' name='password' type='password' placeholder='********' required minLength={8} className='input input-bordered input-primary w-full max-w-xs' />
                     <label className='label'>
                         <span className='label-text'>Channel</span>
                     </label>
-                    <input id='wifi_channel' type='text' placeholder='1' className='input input-bordered input-primary w-full max-w-xs' />
+                    <input id='channel' name='channel' type='text' placeholder='1' defaultValue='1' required className='input input-bordered input-primary w-full max-w-xs' />
                     <label className='label cursor-pointer pt-4 pb-4'>
-                        <span className='label-text'>Hidden</span> 
-                        <input id= 'wifi_hidden' type='checkbox' className='checkbox checkbox-primary' />
+                        <span className='label-text'>Hide SSID</span> 
+                    <input id='hidessid' name='hidessid' type='checkbox' className='checkbox checkbox-primary' />
                     </label>
-                    <button className='btn btn-outline btn-success'>Save & Reboot</button>
+                    <button className='btn btn-success' value='submit'>Save & Reboot</button>
                     </div>
                 </form>
               </div>
-              <div id='tab2_content' className={openTab === 2 ? 'block' : 'hidden'}>
+              <div id='tab_sdcardinfo' className={openTab === 2 ? 'block' : 'hidden'}>
                 {sdcardinfo && renderSDCardInfo}
                 <div className='container pt-6'>
                     <button className='btn btn-error' onClick={() => { window.confirm( 'Are you sure you want to delete all card data?', ) && deleteCardData() }}>Delete All Card Data</button>
                 </div>  
               </div> 
-              <div id='tab3_content' className={openTab === 3 ? 'block' : 'hidden'}>{littlefsinfo && renderLittleFSInfo}</div> 
+              <div id='tab_littlefsinfo' className={openTab === 3 ? 'block' : 'hidden'}>{littlefsinfo && renderLittleFSInfo}</div> 
             {error && renderError}
             </div>
           </article>

@@ -10,12 +10,20 @@
 // Uncomment for debugging / verbose messages
 // #define VERBOSE
 
-// WiFi SoftAP config
-const char *ssid = "Tusk";
-const char *password = "12345678";
-int wifi_channel = 1;
-// 0 = broadcast SSID, 1 = hide SSID
-int wifi_hidden = 0;
+// WiFi config
+// Variables to save values from HTML form
+String ssid;
+String password;
+String channel;
+String hidessid;
+
+// File paths on SD card to save wifi values permanently
+const char *ssidPath = "/ssid.txt";
+const char *passwordPath = "/password.txt";
+const char *channelPath = "/channel.txt";
+const char *hidessidPath = "/hidessid.txt";
+const char *jsoncarddataPath = "/cards.jsonl";
+
 IPAddress local_ip(192, 168, 100, 1);
 IPAddress gateway(192, 168, 100, 1);
 IPAddress subnet(255, 255, 255, 0);
@@ -25,6 +33,52 @@ const int sd_cs = 5;
 
 // Webserver config /
 AsyncWebServer server(80);
+
+// Read File from SD Card
+String readSDFile(const char *path)
+{
+  File file = SD.open(path);
+  if (!file || file.isDirectory())
+  {
+#ifdef VERBOSE
+    Serial.println("[-] Failed to open file for reading");
+#endif
+    return String();
+  }
+
+  String fileContent;
+  while (file.available())
+  {
+    fileContent = file.readStringUntil('\n');
+    break;
+  }
+  return fileContent;
+}
+
+// Write file to SD Card
+void writeSDFile(const char *path, const char *message)
+{
+  File file = SD.open(path, FILE_WRITE);
+  if (!file)
+  {
+#ifdef VERBOSE
+    Serial.println("[-] Failed to open file for writing");
+#endif
+    return;
+  }
+  if (file.print(message))
+  {
+#ifdef VERBOSE
+    Serial.println("[+] File written");
+#endif
+  }
+  else
+  {
+#ifdef VERBOSE
+    Serial.println("[-] File write failed");
+#endif
+  }
+}
 
 /* #####----- Card Reader Config -----##### */
 // Card Reader variables
@@ -556,11 +610,76 @@ void setup()
 {
   Serial.begin(115200);
 
+  // Initialize SD card
+  pinMode(sd_cs, OUTPUT);
+
+  delay(3000);
+  if (!SD.begin(sd_cs))
+  {
+#ifdef VERBOSE
+    Serial.println("[-] SD Card: An error occurred while initializing");
+    Serial.println("[-] SD Card: Fix & Power Cycle");
+#endif
+  }
+  else
+  {
+#ifdef VERBOSE
+    Serial.println("[+] SD Card: Initialized successfully");
+#endif
+  }
+
+  // Initialize LittleFS
+  delay(3000);
+  if (!LittleFS.begin())
+  {
+#ifdef VERBOSE
+    Serial.println("[-] LittleFS: An error occurred while mounting");
+#endif
+  }
+  else
+  {
+#ifdef VERBOSE
+    Serial.println("[+] LittleFS: Mounted successfully");
+#endif
+  }
+
+  // Check if ssid.txt file exists on SD card
+  delay(3000);
+  if (!SD.exists(ssidPath))
+  {
+#ifdef VERBOSE
+    Serial.println("[-] WiFi Config: ssid.txt file not found");
+#endif
+    // If file doesn't exist, create wifi config files
+    writeSDFile(ssidPath, "Tusk");
+    writeSDFile(passwordPath, "12345678");
+    writeSDFile(channelPath, "1");
+    writeSDFile(hidessidPath, "0");
+#ifdef VERBOSE
+    Serial.println("[+] WiFi Config: wifi config files created");
+    Serial.println("[*] WiFi Config: Rebooting...");
+#endif
+    delay(3000);
+    ESP.restart();
+  }
+  else
+  {
+#ifdef VERBOSE
+    Serial.println("[+] WiFi Config: Found ssid.txt and password.txt");
+#endif
+  }
+
+  ssid = readSDFile(ssidPath);
+  password = readSDFile(passwordPath);
+  channel = readSDFile(channelPath);
+  hidessid = readSDFile(hidessidPath);
+
+  // Initialize wifi
   WiFi.disconnect();
   WiFi.mode(WIFI_OFF);
   WiFi.mode(WIFI_AP);
   WiFi.softAPConfig(local_ip, gateway, subnet);
-  WiFi.softAP(ssid, password, wifi_channel, wifi_hidden);
+  WiFi.softAP(ssid.c_str(), password.c_str(), channel.toInt(), hidessid.toInt());
 
 #ifdef VERBOSE
   Serial.println("\n[*] WiFi: Creating ESP32 Access Point");
@@ -576,26 +695,6 @@ void setup()
   attachInterrupt(DATA1, ISR_INT1, FALLING);
   weigand_counter = WEIGAND_WAIT_TIME;
 
-  // Initialize SD card
-  pinMode(sd_cs, OUTPUT);
-
-  // SD.begin(sd_cs);
-
-  delay(5000);
-  if (!SD.begin(sd_cs))
-  {
-#ifdef VERBOSE
-    Serial.println("[-] SD Card: An error occurred while initializing");
-    Serial.println("[-] SD Card: Fix & Power Cycle");
-#endif
-  }
-  else
-  {
-#ifdef VERBOSE
-    Serial.println("[+] SD Card: Initialized successfully");
-#endif
-  }
-
   // Check for cards.jsonl on SD card
   delay(3000);
   if (!SD.exists("/cards.jsonl"))
@@ -605,34 +704,18 @@ void setup()
     Serial.println("[*] SD Card: Created cards.jsonl and performing software reset");
 #endif
     // If file doesn't exist, create it
-    File file = SD.open("/cards.jsonl", FILE_WRITE);
-    file.print("");
-    file.close();
+    writeSDFile(jsoncarddataPath, "");
 #ifdef VERBOSE
     Serial.println("[+] SD Card: File cards.jsonl created");
     Serial.println("[*] SD Card: Rebooting...");
 #endif
-    delay(5000);
+    delay(3000);
     ESP.restart();
   }
   else
   {
 #ifdef VERBOSE
     Serial.println("[+] SD Card: Found cards.jsonl");
-#endif
-  }
-
-  delay(5000);
-  if (!LittleFS.begin())
-  {
-#ifdef VERBOSE
-    Serial.println("[-] LittleFS: An error occurred while mounting");
-#endif
-  }
-  else
-  {
-#ifdef VERBOSE
-    Serial.println("[+] LittleFS: Mounted successfully");
 #endif
   }
 
@@ -727,16 +810,52 @@ void setup()
 
   server.on("/api/delete/carddata", HTTP_GET, [](AsyncWebServerRequest *request)
             {
-             File file = SD.open("/cards.jsonl", FILE_WRITE);
-             file.print("");
-             file.close();
+             writeSDFile(jsoncarddataPath, "");
              request->send(200, "text/plain", "All card data deleted!"); });
+
+  server.on("/wificonfig/update", HTTP_POST, [](AsyncWebServerRequest *request)
+            {
+              int params = request->params();
+              for (int i = 0; i < params; i++)
+              {
+                AsyncWebParameter *p = request->getParam(i);
+                if(p->isPost()){
+                  if (p->name() == "ssid")
+                  {
+                    ssid = p->value().c_str();
+                    writeSDFile(ssidPath, ssid.c_str());
+                  }
+                  if (p->name() == "password")
+                  {
+                    password = p->value().c_str();
+                    writeSDFile(passwordPath, password.c_str());
+                  }
+                  if (p->name() == "channel")
+                  {
+                    channel = p->value().c_str();
+                    writeSDFile(channelPath, channel.c_str());
+                  }
+                  if (p->name() == "hidessid")
+                  {
+                    hidessid = p->value().c_str();
+                    if (hidessid == "on") {
+                      writeSDFile(hidessidPath, "1");
+                    }
+                    else {
+                      writeSDFile(hidessidPath, "0");
+                    } 
+                  }
+#ifdef VERBOSE
+                  Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+#endif
+                }
+              }
+              request->send(200, "text/plain", "WiFi configuration updated... device will now restart!");
+              delay(3000);
+              ESP.restart(); });
 
   server.onNotFound([](AsyncWebServerRequest *request)
                     { request->send(404); });
-
-  // server.on("*", HTTP_GET, [](AsyncWebServerRequest *request)
-  //           { request->redirect("http://" + local_ip.toString()); });
 
   server.begin();
 #ifdef VERBOSE
