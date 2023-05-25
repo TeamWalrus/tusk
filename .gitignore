@@ -22,5 +22,8 @@
 .vscode/launch.json
 .vscode/ipch
 
+# React web app build directory
+firmware/data/
+
 # Macos bs
 .DS_Store
