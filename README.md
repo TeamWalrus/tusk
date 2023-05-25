@@ -13,11 +13,11 @@ The core functionality of the project remains the same: a tool that allows red t
 | Component                  | Description                                                             |
 | -------------------------- | ----------------------------------------------------------------------- |
 | Microcontroller Unit (MCU) | Replace the Arduino with an ESP32                                       |
-| Batteries                  | Replace the AAA with 27100's for the reader and 18650's for the MCU     |
+| Batteries                  | Replace the AA with 27100's for the reader and 18650's for the MCU      |
 | Wireless Connectivity      | The ESP32 has built-in WiFI capability                                  |
 | Web App                    | Simple react web interface                                              |
 | ~~Capability~~             | ~~Decode Gallagher 125kHz proximity cards (Cardax proprietary format)~~ |
-| Enclosure                  | 3D printed enclosure for the PCB\*                                      |
+| ~~Enclosure~~              | ~~3D printed enclosure for the PCB\*~~                                  |
 
 \* One of the main issues with all previous build's I've seen, is the electronic components (microcontroller unit, buck converter and batteries) being housed inside the RFID reader. These components (specifically buck converters) create a lot of 'RF noise' - which interfere with the finely tuned RFID readers. This reduces the effective range of the reader, which can be the difference between capturing access card credentials or not. Housing these components externally, ensures the device operates at it's advertised range capability.
 
