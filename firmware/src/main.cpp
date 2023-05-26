@@ -83,28 +83,28 @@ void writeSDFile(const char *path, const char *message) {
 #define WEIGAND_WAIT_TIME 3000
 
 // stores all of the data bits
-unsigned char databits[MAX_BITS];
+volatile unsigned char databits[MAX_BITS];
 volatile unsigned int bitCount = 0;
 // stores the last written card's data bits
 unsigned char lastWrittenDatabits[MAX_BITS];
 unsigned int lastWrittenBitCount = 0;
 
 // goes low when data is currently being captured
-unsigned char flagDone;
+volatile unsigned char flagDone;
 
 // countdown until we assume there are no more bits
-unsigned int weigand_counter;
+volatile unsigned int weigand_counter;
 
 // decoded facility code
-volatile unsigned long facilityCode = 0;
+unsigned long facilityCode = 0;
 // decoded card code
-volatile unsigned long cardCode = 0;
+unsigned long cardCode = 0;
 
 // Breaking up card value into 2 chunks to create 10 char HEX value
 volatile unsigned long bitHolder1 = 0;
 volatile unsigned long bitHolder2 = 0;
-volatile unsigned long cardChunk1 = 0;
-volatile unsigned long cardChunk2 = 0;
+unsigned long cardChunk1 = 0;
+unsigned long cardChunk2 = 0;
 
 // Define reader input pins
 // card reader DATA0
