@@ -84,8 +84,11 @@ void writeSDFile(const char *path, const char *message) {
 
 // stores all of the data bits
 unsigned char databits[MAX_BITS];
-
 volatile unsigned int bitCount = 0;
+// stores the last written card's data bits
+unsigned char lastWrittenDatabits[MAX_BITS];
+unsigned int lastWrittenBitCount = 0;
+
 // goes low when data is currently being captured
 unsigned char flagDone;
 
@@ -702,6 +705,11 @@ void setup() {
             [](AsyncWebServerRequest *request) {
               writeSDFile(jsoncarddataPath, "");
               request->send(200, "text/plain", "All card data deleted!");
+
+              lastWrittenBitCount = 0;
+              for (unsigned char i = 0; i < MAX_BITS; i++) {
+                lastWrittenDatabits[i] = 0;
+              }
             });
 
   server.on(
@@ -749,6 +757,10 @@ void setup() {
   Serial.println("[+] Webserver: Started");
 #endif
   Serial.println("[*] Tusk is running");
+
+  for (unsigned char i = 0; i < MAX_BITS; i++) {
+    lastWrittenDatabits[i] = 0;
+  }
 }
 
 void loop() {
@@ -761,14 +773,35 @@ void loop() {
   if (bitCount > 0 && flagDone) {
     unsigned char i;
 
-    getCardValues();
-    getCardNumAndSiteCode();
+    // check if the newly read card's bits are the same as the previously
+    // written card's bits
+    bool same = true;
+    if (bitCount == lastWrittenBitCount) {
+      for (i = 0; i < bitCount; i++) {
+        if (databits[i] != lastWrittenDatabits[i]) {
+          same = false;
+          break;
+        }
+      }
+    } else {
+      same = false;
+    }
+
+    if (!same) {
+      getCardValues();
+      getCardNumAndSiteCode();
 
 #ifdef VERBOSE
-    printBits();
+      printBits();
 #endif
 
-    writeSD();
+      writeSD();
+
+      lastWrittenBitCount = bitCount;
+      for (i = 0; i < bitCount; i++) {
+        lastWrittenDatabits[i] = databits[i];
+      }
+    }
 
     // cleanup and get ready for the next card
     bitCount = 0;
