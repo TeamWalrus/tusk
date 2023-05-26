@@ -6,3 +6,5 @@
 
 # React web app build directory
 data/
+
+compile_commands.json
