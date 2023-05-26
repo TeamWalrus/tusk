@@ -151,10 +151,7 @@ void printBits() {
     Serial.println(facilityCode);
     Serial.println("card number: ");
     Serial.println(cardCode);
-    Serial.print("Hex: ");
-    Serial.print(cardChunk1, HEX);
-    Serial.print(' ');
-    Serial.println(cardChunk2, HEX);
+    Serial.printf("Hex: %lx%06lx\n", cardChunk1, cardChunk2);
   }
 }
 
@@ -460,6 +457,14 @@ void getCardValues() {
   return;
 }
 
+String prefixPad(const String &in, const char c, const size_t len) {
+  String out = in;
+  while (out.length() < len) {
+    out = c + out;
+  }
+  return out;
+}
+
 /* #####----- Write to SD card -----##### */
 void writeSD() {
   File SDFile = SD.open("/cards.jsonl", FILE_APPEND);
@@ -469,7 +474,8 @@ void writeSD() {
       doc["bit_length"] = bitCount;
       doc["facility_code"] = facilityCode;
       doc["card_number"] = cardCode;
-      String hex = String(cardChunk1, HEX) + String(cardChunk2, HEX);
+      String hex =
+          String(cardChunk1, HEX) + prefixPad(String(cardChunk2, HEX), '0', 6);
       doc["hex"] = hex;
       String raw;
       for (int i = 19; i >= 0; i--) {
