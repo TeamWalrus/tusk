@@ -122,10 +122,11 @@ void ISR_INT0()
 }
 
 // interrupt that happens when INT1 goes low (1 bit)
-void ISR_INT1()
-{
-  databits[bitCount] = 1;
-  bitCount++;
+void ISR_INT1() {
+  if (bitCount < MAX_BITS) {
+    databits[bitCount] = 1;
+    bitCount++;
+  }
   flagDone = 0;
 
   if (bitCount < 23)
