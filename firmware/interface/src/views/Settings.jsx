@@ -133,7 +133,7 @@ export default function Settings() {
                     <input id='channel' name='channel' type='text' placeholder='1' defaultValue='1' required className='input input-bordered input-primary w-full max-w-xs' />
                     <label className='label cursor-pointer pt-4 pb-4'>
                         <span className='label-text'>Hide SSID</span> 
-                    <input id='hidessid' name='hidessid' type='checkbox' className='checkbox checkbox-primary' />
+                    <input id='hidessid' name='hidessid' type='checkbox' className='toggle toggle-success' />
                     </label>
                     <button className='btn btn-success' value='submit'>Save & Reboot</button>
                     </div>
