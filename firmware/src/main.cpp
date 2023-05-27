@@ -93,7 +93,7 @@ unsigned int lastWrittenBitCount = 0;
 volatile unsigned char flagDone;
 
 // countdown until we assume there are no more bits
-volatile unsigned int weigand_counter;
+volatile unsigned int weigandCounter;
 
 // decoded facility code
 unsigned long facilityCode = 0;
@@ -123,7 +123,7 @@ void ISR_INT0() {
   } else {
     bitHolder2 = bitHolder2 << 1;
   }
-  weigand_counter = WEIGAND_WAIT_TIME;
+  weigandCounter = WEIGAND_WAIT_TIME;
 }
 
 // interrupt that happens when INT1 goes low (1 bit)
@@ -142,7 +142,7 @@ void ISR_INT1() {
     bitHolder2 |= 1;
   }
 
-  weigand_counter = WEIGAND_WAIT_TIME;
+  weigandCounter = WEIGAND_WAIT_TIME;
 }
 
 /* #####----- Print bits function -----##### */
@@ -585,7 +585,7 @@ void setup() {
   // binds the ISR functions to the falling edge of INT0 and INT1
   attachInterrupt(DATA0, ISR_INT0, FALLING);
   attachInterrupt(DATA1, ISR_INT1, FALLING);
-  weigand_counter = WEIGAND_WAIT_TIME;
+  weigandCounter = WEIGAND_WAIT_TIME;
 
   // Check for cards.jsonl on SD card
   delay(3000);
@@ -765,7 +765,7 @@ void setup() {
 
 void loop() {
   if (!flagDone) {
-    if (--weigand_counter == 0)
+    if (--weigandCounter == 0)
       flagDone = 1;
   }
 
