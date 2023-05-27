@@ -75,8 +75,8 @@ export default function DataTable({filter}) {
                         <td>{item.bit_length}</td>
                         <td>{item.facility_code}</td>
                         <td>{item.card_number}</td>
-                        <td>{item.hex}</td>
-                        <td>{item.raw}</td>
+                        <td className='font-mono'>{item.hex}</td>
+                        <td className='font-mono'>{item.raw}</td>
                     </tr>
                     ))}
                 </tbody>
