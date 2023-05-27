@@ -9,7 +9,7 @@
 #include <SPI.h>
 #include <WiFi.h>
 
-// Uncomment for debugging / verbose messages
+// Uncomment for debugging card reads or very verbose messages
 // #define VERBOSE
 
 // WiFi config
@@ -40,9 +40,7 @@ AsyncWebServer server(80);
 String readSDFile(const char *path) {
   File file = SD.open(path);
   if (!file || file.isDirectory()) {
-#ifdef VERBOSE
     Serial.println("[-] Failed to open file for reading");
-#endif
     return String();
   }
 
@@ -58,19 +56,13 @@ String readSDFile(const char *path) {
 void writeSDFile(const char *path, const char *message) {
   File file = SD.open(path, FILE_WRITE);
   if (!file) {
-#ifdef VERBOSE
     Serial.println("[-] Failed to open file for writing");
-#endif
     return;
   }
   if (file.print(message)) {
-#ifdef VERBOSE
     Serial.println("[+] File written");
-#endif
   } else {
-#ifdef VERBOSE
     Serial.println("[-] File write failed");
-#endif
   }
 }
 
@@ -488,20 +480,14 @@ void writeSD() {
         raw += (bitRead(cardChunk2, i));
       }
       doc["raw"] = raw;
-#ifdef VERBOSE
       Serial.println("[+] New Card Read:");
       serializeJsonPretty(doc, Serial);
-#endif
       if (serializeJson(doc, SDFile) == 0) {
-#ifdef VERBOSE
         Serial.println("[-] SD Card: Failed to write json card data to file");
-#endif
       }
       SDFile.print("\n");
       SDFile.close();
-#ifdef VERBOSE
       Serial.println("[+] SD Card: Data Written to SD Card");
-#endif
     }
   }
 }
@@ -514,49 +500,35 @@ void setup() {
 
   delay(3000);
   if (!SD.begin(sd_cs)) {
-#ifdef VERBOSE
     Serial.println("[-] SD Card: An error occurred while initializing");
     Serial.println("[-] SD Card: Fix & Power Cycle");
-#endif
   } else {
-#ifdef VERBOSE
     Serial.println("[+] SD Card: Initialized successfully");
-#endif
   }
 
   // Initialize LittleFS
   delay(3000);
   if (!LittleFS.begin()) {
-#ifdef VERBOSE
     Serial.println("[-] LittleFS: An error occurred while mounting");
-#endif
   } else {
-#ifdef VERBOSE
     Serial.println("[+] LittleFS: Mounted successfully");
-#endif
   }
 
   // Check if ssid.txt file exists on SD card
   delay(3000);
   if (!SD.exists(ssidPath)) {
-#ifdef VERBOSE
     Serial.println("[-] WiFi Config: ssid.txt file not found");
-#endif
     // If file doesn't exist, create wifi config files
     writeSDFile(ssidPath, "Tusk");
     writeSDFile(passwordPath, "12345678");
     writeSDFile(channelPath, "1");
     writeSDFile(hidessidPath, "0");
-#ifdef VERBOSE
     Serial.println("[+] WiFi Config: wifi config files created");
     Serial.println("[*] WiFi Config: Rebooting...");
-#endif
     delay(3000);
     ESP.restart();
   } else {
-#ifdef VERBOSE
     Serial.println("[+] WiFi Config: Found ssid.txt and password.txt");
-#endif
   }
 
   ssid = readSDFile(ssidPath);
@@ -572,11 +544,9 @@ void setup() {
   WiFi.softAP(ssid.c_str(), password.c_str(), channel.toInt(),
               hidessid.toInt());
 
-#ifdef VERBOSE
   Serial.println("\n[*] WiFi: Creating ESP32 Access Point");
   Serial.print("[+] WiFi: Access Point created with IP Gateway: ");
   Serial.println(local_ip);
-#endif
 
   // set tx/rx pins for card reader
   pinMode(DATA0, INPUT); // DATA0 (INT0)
@@ -590,23 +560,17 @@ void setup() {
   // Check for cards.jsonl on SD card
   delay(3000);
   if (!SD.exists("/cards.jsonl")) {
-#ifdef VERBOSE
     Serial.println("[-] SD Card: File cards.jsonl not found");
     Serial.println(
         "[*] SD Card: Created cards.jsonl and performing software reset");
-#endif
     // If file doesn't exist, create it
     writeSDFile(jsoncarddataPath, "");
-#ifdef VERBOSE
     Serial.println("[+] SD Card: File cards.jsonl created");
     Serial.println("[*] SD Card: Rebooting...");
-#endif
     delay(3000);
     ESP.restart();
   } else {
-#ifdef VERBOSE
     Serial.println("[+] SD Card: Found cards.jsonl");
-#endif
   }
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -689,9 +653,7 @@ void setup() {
       }
       SDFile.close();
     } else {
-#ifdef VERBOSE
       Serial.println("[-] SD Card: error opening json data");
-#endif
     }
     // Should we rather be streaming the json data?
     // AsyncResponseStream *response =
@@ -738,10 +700,8 @@ void setup() {
                 writeSDFile(hidessidPath, "0");
               }
             }
-#ifdef VERBOSE
             Serial.printf("POST[%s]: %s\n", p->name().c_str(),
                           p->value().c_str());
-#endif
           }
         }
         request->send(200, "text/plain",
@@ -753,9 +713,7 @@ void setup() {
   server.onNotFound([](AsyncWebServerRequest *request) { request->send(404); });
 
   server.begin();
-#ifdef VERBOSE
   Serial.println("[+] Webserver: Started");
-#endif
   Serial.println("[*] Tusk is running");
 
   for (unsigned char i = 0; i < MAX_BITS; i++) {
