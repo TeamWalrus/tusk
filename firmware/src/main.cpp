@@ -671,8 +671,6 @@ void setup() {
                 lastWrittenDatabits[i] = 0;
               }
               request->send(200, "text/plain", "All card data deleted!");
-              delay(2000);
-              request->redirect("/settings");
             });
 
   server.on(
