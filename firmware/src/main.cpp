@@ -666,12 +666,13 @@ void setup() {
   server.on("/api/delete/carddata", HTTP_GET,
             [](AsyncWebServerRequest *request) {
               writeSDFile(jsoncarddataPath, "");
-              request->send(200, "text/plain", "All card data deleted!");
-
               lastWrittenBitCount = 0;
               for (unsigned char i = 0; i < MAX_BITS; i++) {
                 lastWrittenDatabits[i] = 0;
               }
+              request->send(200, "text/plain", "All card data deleted!");
+              delay(2000);
+              request->redirect("/settings");
             });
 
   server.on(

@@ -142,7 +142,18 @@ export default function Settings() {
               <div id='tab_sdcardinfo' className={openTab === 2 ? 'block' : 'hidden'}>
                 {sdcardinfo && renderSDCardInfo}
                 <div className='container pt-6'>
-                    <button className='btn btn-error' onClick={() => { window.confirm( 'Are you sure you want to delete all card data?', ) && deleteCardData() }}>Delete All Card Data</button>
+                    <label htmlFor='confirm-delete-modal' className='btn btn-error'>Delete All Cards</label>
+                    <input type='checkbox' id='confirm-delete-modal' className='modal-toggle checkbox-error' />
+                    <div className='modal'>
+                        <div className='modal-box'>
+                            <h3 className='font-bold text-lg'>Delete All Card Data</h3>
+                            <p className='py-4'>All card data will be removed from the SD card!<br></br> This action cannot be undone.</p>
+                            <div className='modal-action flex justify-evenly'>
+                                <label htmlFor='confirm-delete-modal' className='btn btn-info'>Cancel</label>
+                                <label htmlFor='confirm-delete-modal' className='btn btn-error' onClick={() => { deleteCardData() }}>Delete</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>  
               </div> 
               <div id='tab_littlefsinfo' className={openTab === 3 ? 'block' : 'hidden'}>{littlefsinfo && renderLittleFSInfo}</div> 
