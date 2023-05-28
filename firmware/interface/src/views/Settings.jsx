@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
 import formatBytes from '../components/FormatBytes';
 
 export default function Settings() {
@@ -35,10 +36,11 @@ export default function Settings() {
           .then((response) => response.text())
           .then((message) => {
               console.log(message);
-              alert(message);
+              toast.success(message);
           })
           .catch((error) => {
               setError(error);
+              toast.error(error);
           });
   }
 
@@ -154,7 +156,8 @@ export default function Settings() {
                             </div>
                         </div>
                     </div>
-                </div>  
+                </div>
+                <Toaster />  
               </div> 
               <div id='tab_littlefsinfo' className={openTab === 3 ? 'block' : 'hidden'}>{littlefsinfo && renderLittleFSInfo}</div> 
             {error && renderError}
