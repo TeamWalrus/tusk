@@ -7,6 +7,7 @@ export default function Settings() {
   const [openTab, setOpenTab] = React.useState(1);
   const [littlefsinfo, setLittleFSinfo] = useState([]);
   const [sdcardinfo, setSDCardInfo] = useState([]);
+  const [wificonfig, setWiFiConfig] = useState([]);
   const [error, setError] = useState('');
 
   const getLittleFSInfo = async () => {
@@ -31,6 +32,18 @@ export default function Settings() {
           });
   }
 
+  const getWiFiConfig = async () => {
+      fetch('/api/wificonfig')
+          .then((response) => response.json())
+          .then((currentwificonfig) => {
+              setWiFiConfig(currentwificonfig);
+              console.log(currentwificonfig);
+          })
+          .catch((error) => {
+              setError(error);
+          });
+  }
+
   const deleteCardData = async () => {
       fetch('/api/delete/carddata')
           .then((response) => response.text())
@@ -47,6 +60,7 @@ export default function Settings() {
   useEffect(() => {
       getLittleFSInfo();
       getSDCardInfo();
+      getWiFiConfig();
   }, [])
 
   const prettylittlefsinfototal = formatBytes(littlefsinfo.totalBytes);
@@ -119,23 +133,23 @@ export default function Settings() {
             </div>
             <div className='tabscontent pt-6'>
               <div id='tab_wificonfig' className={openTab === 1 ? 'block' : 'hidden'}>
-                <form action='/wificonfig/update' method='POST'>
+                <form action='/api/wificonfig/update' method='POST'>
                     <div className='form-control w-full max-w-xs'>
                     <label className='label'>
                         <span className='label-text'>Name (SSID)</span>
                     </label>
-                    <input id='ssid' name='ssid' type='text' placeholder='Tusk' defaultValue='Tusk' required className='input input-bordered input-primary w-full max-w-xs' />
+                    <input id='ssid' name='ssid' type='text' placeholder={wificonfig.ssid} defaultValue={wificonfig.ssid} required className='input input-bordered input-primary w-full max-w-xs' />
                     <label className='label'>
                         <span className='label-text'>Password</span>
                     </label>
-                    <input id='password' name='password' type='password' placeholder='********' required minLength={8} className='input input-bordered input-primary w-full max-w-xs' />
+                    <input id='password' name='password' type='password' placeholder='********' defaultValue={wificonfig.password} required minLength={8} className='input input-bordered input-primary w-full max-w-xs' />
                     <label className='label'>
                         <span className='label-text'>Channel</span>
                     </label>
-                    <input id='channel' name='channel' type='text' placeholder='1' defaultValue='1' required className='input input-bordered input-primary w-full max-w-xs' />
+                    <input id='channel' name='channel' type='text' placeholder={wificonfig.channel} defaultValue={wificonfig.channel} required className='input input-bordered input-primary w-full max-w-xs' />
                     <label className='label cursor-pointer pt-4 pb-4'>
                         <span className='label-text'>Hide SSID</span> 
-                    <input id='hidessid' name='hidessid' type='checkbox' className='toggle toggle-success' />
+                    <input id='hidessid' name='hidessid' type='checkbox' className='toggle toggle-success' {...wificonfig.hidessid === '0' ? '' : 'defaultChecked'} />
                     </label>
                     <button className='btn btn-success' value='submit'>Save & Reboot</button>
                     </div>

@@ -37,7 +37,7 @@ const int sd_cs = 5;
 AsyncWebServer server(80);
 
 // Read File from SD Card
-String readSDFile(const char *path) {
+String readSDFileLF(const char *path) {
   File file = SD.open(path);
   if (!file || file.isDirectory()) {
     Serial.println("[-] Failed to open file for reading");
@@ -50,6 +50,7 @@ String readSDFile(const char *path) {
     break;
   }
   return fileContent;
+  file.close();
 }
 
 // Write file to SD Card
@@ -64,6 +65,7 @@ void writeSDFile(const char *path, const char *message) {
   } else {
     Serial.println("[-] File write failed");
   }
+  file.close();
 }
 
 /* #####----- Card Reader Config -----##### */
@@ -528,13 +530,13 @@ void setup() {
     delay(3000);
     ESP.restart();
   } else {
-    Serial.println("[+] WiFi Config: Found ssid.txt and password.txt");
+    Serial.println("[+] WiFi Config: Found ssid.txt - assuming remaining wifi config files exist >.>");
   }
 
-  ssid = readSDFile(ssidPath);
-  password = readSDFile(passwordPath);
-  channel = readSDFile(channelPath);
-  hidessid = readSDFile(hidessidPath);
+  ssid = readSDFileLF(ssidPath);
+  password = readSDFileLF(passwordPath);
+  channel = readSDFileLF(channelPath);
+  hidessid = readSDFileLF(hidessidPath);
 
   // Initialize wifi
   WiFi.disconnect();
@@ -544,7 +546,7 @@ void setup() {
   WiFi.softAP(ssid.c_str(), password.c_str(), channel.toInt(),
               hidessid.toInt());
 
-  Serial.println("\n[*] WiFi: Creating ESP32 Access Point");
+  Serial.println("[*] WiFi: Creating ESP32 Access Point");
   Serial.print("[+] WiFi: Access Point created with IP Gateway: ");
   Serial.println(local_ip);
 
@@ -673,8 +675,21 @@ void setup() {
               request->send(200, "text/plain", "All card data deleted!");
             });
 
+  server.on("/api/wificonfig", HTTP_GET,
+            [](AsyncWebServerRequest *request) {
+            AsyncResponseStream *response =
+                request->beginResponseStream("application/json");
+            DynamicJsonDocument json(512);
+            json["ssid"] = ssid;
+            json["password"] = password;
+            json["channel"] = channel;
+            json["hidessid"] = hidessid;
+            serializeJson(json, *response);
+            request->send(response); 
+            });
+
   server.on(
-      "/wificonfig/update", HTTP_POST, [](AsyncWebServerRequest *request) {
+      "/api/wificonfig/update", HTTP_POST, [](AsyncWebServerRequest *request) {
         int params = request->params();
         for (int i = 0; i < params; i++) {
           AsyncWebParameter *p = request->getParam(i);
