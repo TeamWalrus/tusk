@@ -585,6 +585,12 @@ void setup() {
     request->send(response);
   });
 
+  server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request) {
+    AsyncWebServerResponse *response =
+        request->beginResponse(LittleFS, "/favicon.ico", "image/png");
+    request->send(response); 
+  });
+
   server.on("/settings", HTTP_GET, [](AsyncWebServerRequest *request) {
 #ifdef VERBOSE
     Serial.println("[*] Webserver: Serving file:  /index.html.gz");
