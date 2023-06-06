@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import formatBytes from "../components/FormatBytes";
 
@@ -8,6 +8,7 @@ export default function Settings() {
   const [sdcardinfo, setSDCardInfo] = useState([]);
   const [wificonfig, setWiFiConfig] = useState([]);
   const [error, setError] = useState("");
+  const form = useRef(null);
 
   const getLittleFSInfo = async () => {
     fetch("/api/littlefsinfo")
@@ -40,6 +41,27 @@ export default function Settings() {
       })
       .catch((error) => {
         setError(error);
+      });
+  };
+
+  const submitWiFiUpdate = (e) => {
+    e.preventDefault();
+    fetch("/api/wificonfig/update", {
+      method: "POST",
+      body: new URLSearchParams(new FormData(form.current)),
+      headers: {
+        "Content-type": "application/x-www-form-urlencoded",
+      },
+    })
+      // Getting 302 instead of 200 with response...
+      .then((response) => response.text())
+      .then((message) => {
+        console.log(message);
+        toast.success(message);
+      })
+      .catch((error) => {
+        setError(error);
+        toast.error(error);
       });
   };
 
@@ -165,7 +187,7 @@ export default function Settings() {
               id="tab_wificonfig"
               className={openTab === 1 ? "block" : "hidden"}
             >
-              <form action="/api/wificonfig/update" method="POST">
+              <form ref={form} onSubmit={submitWiFiUpdate}>
                 <div className="form-control w-full max-w-xs">
                   <label className="label">
                     <span className="label-text">Name (SSID)</span>

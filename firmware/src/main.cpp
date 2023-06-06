@@ -714,12 +714,11 @@ void setup() {
                 writeSDFile(hidessidPath, "0");
               }
             }
-            Serial.printf("POST[%s]: %s\n", p->name().c_str(),
+            Serial.printf("[+] Webserver: FormData - [%s]: %s\n", p->name().c_str(),
                           p->value().c_str());
           }
         }
-        request->send(200, "text/plain",
-                      "WiFi configuration updated... device will now restart!");
+        request->send(200, "text/plain", "WiFi config updated. Rebooting now");
         delay(3000);
         ESP.restart();
       });
