@@ -1,4 +1,4 @@
-# Tusk: Re-Weaponising long range RFID readers
+# Tusk: Revamping an old weaponised RFID reader tool
 
 This repo contains the hardware and software upgrades made to the original [Tastic RFID Thief project](https://bishopfox.com/resources/rfid-hacking-intro-to-tastic-rfid-thief), which was created by Francis Brown at Bishop Fox.
 
