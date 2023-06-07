@@ -3,7 +3,7 @@ import toast, { Toaster } from "react-hot-toast";
 import formatBytes from "../components/FormatBytes";
 
 export default function Settings() {
-  const [openTab, setOpenTab] = React.useState(1);
+  const [opentab, setOpenTab] = useState(1);
   const [littlefsinfo, setLittleFSinfo] = useState([]);
   const [sdcardinfo, setSDCardInfo] = useState([]);
   const [wificonfig, setWiFiConfig] = useState([]);
@@ -37,14 +37,13 @@ export default function Settings() {
       .then((response) => response.json())
       .then((currentwificonfig) => {
         setWiFiConfig(currentwificonfig);
-        console.log(currentwificonfig);
       })
       .catch((error) => {
         setError(error);
       });
   };
 
-  const submitWiFiUpdate = (e) => {
+  const submitWiFiUpdate = async (e) => {
     e.preventDefault();
     fetch("/api/wificonfig/update", {
       method: "POST",
@@ -53,11 +52,10 @@ export default function Settings() {
         "Content-type": "application/x-www-form-urlencoded",
       },
     })
-      // Getting 302 instead of 200 with response...
       .then((response) => response.text())
       .then((message) => {
-        console.log(message);
         toast.success(message);
+        fetch("/api/device/reboot");
       })
       .catch((error) => {
         setError(error);
@@ -69,7 +67,6 @@ export default function Settings() {
     fetch("/api/delete/carddata")
       .then((response) => response.text())
       .then((message) => {
-        console.log(message);
         toast.success(message);
       })
       .catch((error) => {
@@ -150,7 +147,7 @@ export default function Settings() {
           <div className="tabs">
             <a
               className={
-                "tab tab-lifted " + (openTab === 1 ? "tab-active" : "")
+                "tab tab-lifted " + (opentab === 1 ? "tab-active" : "")
               }
               onClick={(e) => {
                 e.preventDefault();
@@ -161,7 +158,7 @@ export default function Settings() {
             </a>
             <a
               className={
-                "tab tab-lifted " + (openTab === 2 ? "tab-active" : "")
+                "tab tab-lifted " + (opentab === 2 ? "tab-active" : "")
               }
               onClick={(e) => {
                 e.preventDefault();
@@ -172,7 +169,7 @@ export default function Settings() {
             </a>
             <a
               className={
-                "tab tab-lifted " + (openTab === 3 ? "tab-active" : "")
+                "tab tab-lifted " + (opentab === 3 ? "tab-active" : "")
               }
               onClick={(e) => {
                 e.preventDefault();
@@ -185,7 +182,7 @@ export default function Settings() {
           <div className="tabscontent pt-6">
             <div
               id="tab_wificonfig"
-              className={openTab === 1 ? "block" : "hidden"}
+              className={opentab === 1 ? "block" : "hidden"}
             >
               <form ref={form} onSubmit={submitWiFiUpdate}>
                 <div className="form-control w-full max-w-xs">
@@ -244,7 +241,7 @@ export default function Settings() {
             </div>
             <div
               id="tab_sdcardinfo"
-              className={openTab === 2 ? "block" : "hidden"}
+              className={opentab === 2 ? "block" : "hidden"}
             >
               {sdcardinfo && renderSDCardInfo}
               <div className="container pt-6">
@@ -283,11 +280,11 @@ export default function Settings() {
                   </div>
                 </div>
               </div>
-              <Toaster />
+
             </div>
             <div
               id="tab_littlefsinfo"
-              className={openTab === 3 ? "block" : "hidden"}
+              className={opentab === 3 ? "block" : "hidden"}
             >
               {littlefsinfo && renderLittleFSInfo}
             </div>

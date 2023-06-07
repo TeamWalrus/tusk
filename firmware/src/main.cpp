@@ -683,15 +683,15 @@ void setup() {
 
   server.on("/api/wificonfig", HTTP_GET,
             [](AsyncWebServerRequest *request) {
-            AsyncResponseStream *response =
-                request->beginResponseStream("application/json");
-            DynamicJsonDocument json(512);
-            json["ssid"] = ssid;
-            json["password"] = password;
-            json["channel"] = channel;
-            json["hidessid"] = hidessid;
-            serializeJson(json, *response);
-            request->send(response); 
+              AsyncResponseStream *response =
+                  request->beginResponseStream("application/json");
+              DynamicJsonDocument json(512);
+              json["ssid"] = ssid;
+              json["password"] = password;
+              json["channel"] = channel;
+              json["hidessid"] = hidessid;
+              serializeJson(json, *response);
+              request->send(response); 
             });
 
   server.on(
@@ -725,9 +725,12 @@ void setup() {
           }
         }
         request->send(200, "text/plain", "WiFi config updated. Rebooting now");
-        delay(3000);
-        ESP.restart();
       });
+
+  server.on("/api/device/reboot", HTTP_GET, [](AsyncWebServerRequest *request) {
+    delay(5000);
+    ESP.restart();
+  });
 
   server.onNotFound([](AsyncWebServerRequest *request) { request->send(404); });
 
