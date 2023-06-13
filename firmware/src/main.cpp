@@ -9,9 +9,6 @@
 #include <SPI.h>
 #include <WiFi.h>
 
-// Uncomment for debugging card reads or very verbose messages
-// #define VERBOSE
-
 // WiFi config
 // Variables to save values from HTML form
 String ssid;
@@ -482,7 +479,7 @@ void writeSD() {
         raw += (bitRead(cardChunk2, i));
       }
       doc["raw"] = raw;
-      Serial.println("[+] New Card Read:");
+      Serial.println("[+] New Card Read: ");
       serializeJsonPretty(doc, Serial);
       if (serializeJson(doc, SDFile) == 0) {
         Serial.println("[-] SD Card: Failed to write json card data to file");
@@ -499,7 +496,6 @@ void setup() {
 
   // Initialize SD card
   pinMode(sd_cs, OUTPUT);
-
   delay(3000);
   if (!SD.begin(sd_cs)) {
     Serial.println("[-] SD Card: An error occurred while initializing");
@@ -525,7 +521,7 @@ void setup() {
     writeSDFile(passwordPath, "12345678");
     writeSDFile(channelPath, "1");
     writeSDFile(hidessidPath, "0");
-    Serial.println("[+] WiFi Config: wifi config files created");
+    Serial.println("[+] WiFi Config: WiFi config files created");
     Serial.println("[*] WiFi Config: Rebooting...");
     delay(3000);
     ESP.restart();
@@ -546,8 +542,9 @@ void setup() {
   WiFi.softAP(ssid.c_str(), password.c_str(), channel.toInt(),
               hidessid.toInt());
 
-  Serial.println("[*] WiFi: Creating ESP32 Access Point");
-  Serial.print("[+] WiFi: Access Point created with IP Gateway: ");
+  Serial.print("[+] WiFi: Creating access point: ");
+  Serial.println(ssid);
+  Serial.print("[+] WiFi: Gateway IP address: ");
   Serial.println(local_ip);
 
   // set tx/rx pins for card reader
@@ -576,9 +573,6 @@ void setup() {
   }
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-#ifdef VERBOSE
-    Serial.println("[*] Webserver: Serving file:  /index.html.gz");
-#endif
     AsyncWebServerResponse *response =
         request->beginResponse(LittleFS, "/index.html.gz", "text/html");
     response->addHeader("Content-Encoding", "gzip");
@@ -592,9 +586,7 @@ void setup() {
   });
 
   server.on("/settings", HTTP_GET, [](AsyncWebServerRequest *request) {
-#ifdef VERBOSE
     Serial.println("[*] Webserver: Serving file:  /index.html.gz");
-#endif
     AsyncWebServerResponse *response =
         request->beginResponse(LittleFS, "/index.html.gz", "text/html");
     response->addHeader("Content-Encoding", "gzip");
@@ -604,10 +596,8 @@ void setup() {
   server.on("/assets/*", HTTP_GET, [](AsyncWebServerRequest *request) {
     String url = request->url();
     String urlgz = url + ".gz";
-#ifdef VERBOSE
-    Serial.println("[*] Webserver: Requested url file: " + url);
+    Serial.println("[*] Webserver: Requested url: " + url);
     Serial.println("[*] Webserver: Serving gzipped file: " + url);
-#endif
     String contentType = url.substring(url.length() - 3);
     if (contentType == "tml" || contentType == "htm")
       contentType = "text/html";
@@ -625,7 +615,6 @@ void setup() {
       contentType = "image/svg+xml";
     else
       contentType = "text/plain";
-
     AsyncWebServerResponse *response =
         request->beginResponse(LittleFS, urlgz, contentType);
     response->addHeader("Content-Encoding", "gzip");
@@ -664,8 +653,7 @@ void setup() {
       Serial.println("[-] SD Card: error opening json data");
     }
     // Should we rather be streaming the json data?
-    // AsyncResponseStream *response =
-    // request->beginResponseStream("application/json");
+    // https://github.com/me-no-dev/ESPAsyncWebServer#arduinojson-advanced-response
     AsyncWebServerResponse *response =
         request->beginResponse(200, "application/x-ndjson", cardData);
     request->send(response);
@@ -729,6 +717,7 @@ void setup() {
 
   server.on("/api/device/reboot", HTTP_GET, [](AsyncWebServerRequest *request) {
     delay(5000);
+    Serial.println("[*] Rebooting...");
     ESP.restart();
   });
 
@@ -771,9 +760,7 @@ void loop() {
       getCardValues();
       getCardNumAndSiteCode();
 
-#ifdef VERBOSE
       printBits();
-#endif
 
       writeSD();
 
