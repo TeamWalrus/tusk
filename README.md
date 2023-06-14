@@ -21,27 +21,36 @@ The core functionality of the project remains the same: a tool that allows red t
 
 \* One of the main issues with all previous build's I've seen, is the electronic components (microcontroller unit, buck converter and batteries) being housed inside the RFID reader. These components (specifically buck converters) create a lot of 'RF noise' - which interfere with the finely tuned RFID readers. This reduces the effective range of the reader, which can be the difference between capturing access card credentials or not. Housing these components externally, ensures the device operates at it's advertised range capability.
 
+![tusk-pcb](/images/tusk-pcb-v0-3.jpg)
+
 ## Acknowledgments
 
-Before going into the details of the updates, it's important to acknowledge previous work done on this project.
+It's important to acknowledge previous work done on this project:
 
-- Fran Brown: original Tastic RFID Thief (https://www.bishopfox.com/resources/tools/rfid-hacking/attack-tools/).
-- Folks who updated the original Arduino code
-  - ninewires: https://github.com/ninewires/Prox_Thief/blob/master/Prox_Thief.ino
-  - ShakataGaNai: https://gist.github.com/ShakataGaNai/4319d3e82a858c9d00c1d80f20da81a3
-- Other interesting projects / upgraded versions of the RFID Thief
-  - Mike Kelly's Wiegotcha: https://github.com/lixmk/Wiegotcha
-  - Corey Harding's ESP-RFID-Tool: https://github.com/rfidtool/ESP-RFID-Tool
+- Fran Brown: original Tastic RFID Thief: `https://www.bishopfox.com/resources/tools/rfid-hacking/attack-tools/`
+- Folks who updated the original Arduino code:
+  - ninewires: `https://github.com/ninewires/Prox_Thief/blob/master/Prox_Thief.ino`
+  - ShakataGaNai: `https://gist.github.com/ShakataGaNai/4319d3e82a858c9d00c1d80f20da81a3`
+- Other interesting projects / upgraded versions of the RFID Thief:
+  - Mike Kelly's Wiegotcha: `https://github.com/lixmk/Wiegotcha`
+  - Corey Harding's ESP-RFID-Thief: `https://github.com/exploitagency/ESP-RFID-Thief`
+
+Thanks to my mate @megabug for always helping out with my projects :)
 
 Thanks to my employer [Aura Information Security](https://www.aurainfosec.com/) for providing time for me to work on this project.
 
 ![aura-logo](https://user-images.githubusercontent.com/27876907/188373880-8157648c-eb94-4054-81c8-7c61692b0367.png)
+
 
 # Hardware
 
 Gerber files, BOM, and Pick and Place files required to get the PCB manufactured. This is a PCB that houses the batteries for the long range reader, ESP32 microcontroller unit, and sd-card reader.
 
 The tusk PCB has 5 x 27100 li-ion batteries slots that will power the long range reader. That means the output voltage is 4.2V x 5 = 21V. This should be within the operating voltage of the long range readers listed above. However, I recommend checking this before hooking up your reader.
+
+**Note**: the ESP32 footprint on the PCB is for an ESP32-DevKitC-V4. Older ESP32-DevKit-V1 will not fit.
+
+![devkitv1-vs-devkitv4](/images/devkitv1-vs-devkitv4.jpg)
 
 # Firmware & Software
 
