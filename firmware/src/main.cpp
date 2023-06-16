@@ -659,14 +659,16 @@ void setup() {
     request->send(response);
   });
 
-  server.on("/api/delete/carddata", HTTP_GET,
+  server.on("/api/delete/carddata", HTTP_POST,
             [](AsyncWebServerRequest *request) {
               writeSDFile(jsoncarddataPath, "");
               lastWrittenBitCount = 0;
               for (unsigned char i = 0; i < MAX_BITS; i++) {
                 lastWrittenDatabits[i] = 0;
               }
-              request->send(200, "text/plain", "All card data deleted!");
+              AsyncWebServerResponse *response =
+                  request->beginResponse(200, "text/plain", "All card data deleted!");
+              request->send(response);
             });
 
   server.on("/api/wificonfig", HTTP_GET,
@@ -715,11 +717,14 @@ void setup() {
         request->send(200, "text/plain", "WiFi config updated. Rebooting now");
       });
 
-  server.on("/api/device/reboot", HTTP_GET, [](AsyncWebServerRequest *request) {
-    delay(5000);
-    Serial.println("[*] Rebooting...");
-    ESP.restart();
-  });
+  server.on("/api/device/reboot", HTTP_POST, [](AsyncWebServerRequest *request) {
+      AsyncWebServerResponse *response =
+        request->beginResponse(200, "text/plain", "Rebooting device");
+      request->send(response);
+      delay(5000);
+      Serial.println("[*] Rebooting...");
+      ESP.restart(); 
+    });
 
   server.onNotFound([](AsyncWebServerRequest *request) { request->send(404); });
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import formatBytes from "../components/FormatBytes";
+import ErrorAlert from "../components/ErrorAlert";
 
 export default function Settings() {
   const [opentab, setOpenTab] = useState(1);
@@ -10,37 +11,64 @@ export default function Settings() {
   const [error, setError] = useState("");
   const form = useRef(null);
 
+  const fetchApiRequest = async (url) => {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        setError("Network response was not ok");
+      }
+      return await response.json();
+    } catch (error) {
+      setError(error);
+      throw error;
+    }
+  };
+
   const getLittleFSInfo = async () => {
-    fetch("/api/littlefsinfo")
-      .then((response) => response.json())
-      .then((littlefsinfo) => {
+    try {
+        const littlefsinfo = await fetchApiRequest("/api/littlefsinfo");
         setLittleFSinfo(littlefsinfo);
-      })
-      .catch((error) => {
-        setError(error);
-      });
+      } catch (error) {
+        // setError(error) already handled in the fetchApiRequest
+    }
   };
 
   const getSDCardInfo = async () => {
-    fetch("/api/sdcardinfo")
-      .then((response) => response.json())
-      .then((sdcardinfo) => {
+    try {
+        const sdcardinfo = await fetchApiRequest("/api/sdcardinfo");
         setSDCardInfo(sdcardinfo);
-      })
-      .catch((error) => {
-        setError(error);
-      });
+      } catch (error) {
+        // setError(error) already handled in the fetchApiRequest
+    }
   };
 
   const getWiFiConfig = async () => {
-    fetch("/api/wificonfig")
-      .then((response) => response.json())
-      .then((currentwificonfig) => {
+    try {
+        const currentwificonfig = await fetchApiRequest("/api/wificonfig");
         setWiFiConfig(currentwificonfig);
-      })
-      .catch((error) => {
-        setError(error);
+      } catch (error) {
+        // setError(error) already handled in the fetchApiRequest
+    }
+  };
+
+  const postApiRequest = async (url, data = {}) => {
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
       });
+
+      if (!response.ok) {
+        setError("Network response was not ok");
+      }
+
+      return response.text();
+    } catch (error) {
+      setError(error);
+    }
   };
 
   const submitWiFiUpdate = async (e) => {
@@ -55,7 +83,7 @@ export default function Settings() {
       .then((response) => response.text())
       .then((message) => {
         toast.success(message);
-        fetch("/api/device/reboot");
+        postApiRequest("/api/device/reboot");
       })
       .catch((error) => {
         setError(error);
@@ -64,15 +92,13 @@ export default function Settings() {
   };
 
   const deleteCardData = async () => {
-    fetch("/api/delete/carddata")
-      .then((response) => response.text())
-      .then((message) => {
-        toast.success(message);
-      })
-      .catch((error) => {
-        setError(error);
-        toast.error(error);
-      });
+    try {
+      const message = await postApiRequest("/api/delete/carddata");
+      toast.success(message);
+    } catch (error) {
+      // setError(error) already handled in the postApiRequest
+      toast.error(error);
+    }
   };
 
   useEffect(() => {
@@ -81,8 +107,10 @@ export default function Settings() {
     getWiFiConfig();
   }, []);
 
-  const prettylittlefsinfototal = formatBytes(littlefsinfo.totalBytes);
-  const prettylittlefsinfoused = formatBytes(littlefsinfo.usedBytes);
+  const { totalBytes: littlefsTotalBytes, usedBytes: littlefsUsedBytes } = littlefsinfo;
+  const prettylittlefsinfototal = formatBytes(littlefsTotalBytes);
+  const prettylittlefsinfoused = formatBytes(littlefsUsedBytes);
+
   const renderLittleFSInfo = (
     <div className="container">
       <div className="stats shadow">
@@ -97,9 +125,11 @@ export default function Settings() {
       </div>
     </div>
   );
+  
+  const { totalBytes: sdcardTotalBytes, usedBytes: sdcardUsedBytes } = sdcardinfo;
+  const prettysdcardinfototal = formatBytes(sdcardTotalBytes);
+  const prettysdcardinfoused = formatBytes(sdcardUsedBytes);
 
-  const prettysdcardinfototal = formatBytes(sdcardinfo.totalBytes);
-  const prettysdcardinfoused = formatBytes(sdcardinfo.usedBytes);
   const renderSDCardInfo = (
     <div className="container">
       <div className="stats shadow">
@@ -110,29 +140,6 @@ export default function Settings() {
         <div className="stat place-items-center">
           <div className="stat-title text-warning font-semibold">Used</div>
           <div className="stat-value">{prettysdcardinfoused}</div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderError = (
-    <div className="flex justify-center items-center pt-6">
-      <div className="text-center">
-        <div className="alert alert-error">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="stroke-current shrink-0 h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <span>{error}</span>
         </div>
       </div>
     </div>
@@ -285,7 +292,7 @@ export default function Settings() {
             >
               {littlefsinfo && renderLittleFSInfo}
             </div>
-            {error && renderError}
+            {error && <ErrorAlert message={error} />}
           </div>
         </article>
       </div>
