@@ -63,8 +63,10 @@ export default function DataTable({ filter }) {
         <thead>
           <tr>
             <th>Bit Length</th>
+            <th>Region Code</th>
             <th>Facility Code</th>
             <th>Card Number</th>
+            <th>Issue Level</th>
             <th>Hex</th>
             <th>Raw</th>
           </tr>
@@ -73,10 +75,22 @@ export default function DataTable({ filter }) {
           {filteredCardData.map((item, index) => (
             <tr key={index}>
               <td>{item.bit_length}</td>
+              <td>{item.region_code}</td>
               <td>{item.facility_code}</td>
               <td>{item.card_number}</td>
+              <td>{item.issue_level}</td>
               <td className="font-mono">{item.hex}</td>
-              <td className="font-mono">{item.raw}</td>
+              <td>
+              <label htmlFor={("modal_" + index)} className="btn btn-sm btn-outline btn-info">Show</label>
+              <input type="checkbox" id={("modal_" + index)} className="modal-toggle" />
+              <div className="modal">
+                <div className="modal-box">
+                  <h3 className="text-lg font-bold">Raw Data</h3>
+                  <p className="py-4 font-mono">{item.raw}</p>
+                </div>
+                <label className="modal-backdrop" htmlFor={("modal_" + index)}>Close</label>
+              </div>
+              </td>
             </tr>
           ))}
         </tbody>
