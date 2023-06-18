@@ -74,8 +74,8 @@ Clients connect to the ESP32 over WiFi and view captured card credentials via a 
 Captured card credentials are written to the sd card in newline-delimited JSON (`cards.jsonl`). For example:
 
 ```
-{"bit_length":26,"facility_code":123,"card_number":123123,"hex":"AAAAAAA","raw":"0010101010010011000101010"}
-{"bit_length":26,"facility_code":555,"card_number":678678,"hex":"FFFFFFF","raw":"0000000000000000000000000"}
+{"card_type":"hid","bit_length":26,"facility_code":123,"card_number":123123,"hex":"AAAAAAA","raw":"0010101010010011000101010"}
+{"card_type":"gallagher","region_code":4,"bit_length":46,"facility_code":2222,"card_number":1111,"issue_level":3,"hex":"A38A8A4BA3A3A32C","raw":"101000110100010101100010101010010110101000110101000110101000110001011001"}
 ```
 
 # Enclosure
