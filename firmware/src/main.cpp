@@ -86,6 +86,9 @@ volatile unsigned char flagDone;
 // countdown until we assume there are no more bits
 volatile unsigned int weigandCounter;
 
+// card type
+String cardType = "";
+
 // decoded facility code
 unsigned long facilityCode = 0;
 // decoded card code
@@ -139,6 +142,8 @@ void ISR_INT1() {
 /* #####----- Print bits function -----##### */
 void printBits() {
   if (bitCount >= 26) { // ignore data caused by noise
+    Serial.print("card type: ");
+    Serial.println(cardType);
     Serial.print("bit length: ");
     Serial.println(bitCount);
     Serial.println("facility code: ");
@@ -465,6 +470,8 @@ void writeSD() {
   if (SDFile) {
     if (bitCount >= 26) { // ignore data caused by noise
       DynamicJsonDocument doc(512);
+      // todo: hardcoded to hid for testing
+      doc["card_type"] = "hid";
       doc["bit_length"] = bitCount;
       doc["facility_code"] = facilityCode;
       doc["card_number"] = cardCode;
@@ -776,6 +783,7 @@ void loop() {
     }
 
     // cleanup and get ready for the next card
+    cardType = "";
     bitCount = 0;
     facilityCode = 0;
     cardCode = 0;

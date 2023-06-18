@@ -2,6 +2,9 @@ import React, { useState, useEffect, useMemo } from "react";
 import ndjsonStream from "can-ndjson-stream";
 import Spinner from "./Spinner";
 import ErrorAlert from "./ErrorAlert";
+import hidLogo from "../assets/hid_logo.png";
+import gallagherLogo from "../assets/gallagher_logo.png";
+
 
 export default function DataTable({ filter }) {
   const [cardData, setCardCata] = useState([]);
@@ -51,6 +54,15 @@ export default function DataTable({ filter }) {
     };
   }, []);
 
+  const renderCardTypeImage = (cardType) => {
+    switch (cardType) {
+      case "hid":
+        return <img class="h-auto max-w-xs mx-auto" width="80px" src={hidLogo} alt="hid-logo" />;
+      case "gallagher":
+        return <img class="h-auto max-w-xs mx-auto" width="120px" src={gallagherLogo} alt="gallagher-logo" />;
+    }
+  };
+
   const filteredCardData = useMemo(() =>
     cardData.filter((card) => {
       return card.card_number.toString().includes(Object.values({ filter }));
@@ -62,6 +74,7 @@ export default function DataTable({ filter }) {
       <table className="table w-full">
         <thead>
           <tr>
+            <th>Type</th>
             <th>Bit Length</th>
             <th>Region Code</th>
             <th>Facility Code</th>
@@ -74,6 +87,7 @@ export default function DataTable({ filter }) {
         <tbody>
           {filteredCardData.map((item, index) => (
             <tr key={index}>
+              <td>{renderCardTypeImage(item.card_type)}</td>
               <td>{item.bit_length}</td>
               <td>{item.region_code}</td>
               <td>{item.facility_code}</td>
@@ -81,14 +95,14 @@ export default function DataTable({ filter }) {
               <td>{item.issue_level}</td>
               <td className="font-mono">{item.hex}</td>
               <td>
-              <label htmlFor={("modal_" + index)} className="btn btn-sm btn-outline btn-info">Show</label>
-              <input type="checkbox" id={("modal_" + index)} className="modal-toggle" />
+              <label htmlFor={("rawdata_modal_" + index)} className="btn btn-sm btn-outline btn-info">Show</label>
+              <input type="checkbox" id={("rawdata_modal_" + index)} className="modal-toggle" />
               <div className="modal">
                 <div className="modal-box">
                   <h3 className="text-lg font-bold">Raw Data</h3>
                   <p className="py-4 font-mono">{item.raw}</p>
                 </div>
-                <label className="modal-backdrop" htmlFor={("modal_" + index)}>Close</label>
+                <label className="modal-backdrop" htmlFor={("rawdata_modal_" + index)}>Close</label>
               </div>
               </td>
             </tr>
