@@ -124,9 +124,7 @@ export default function DataTable({ filter }) {
         <table className="table w-full">
           <thead>
             <tr>
-              <th onClick={() => handleSort("card_type")}>
-                Type {renderSortIndicator("card_type")}
-              </th>
+              <th>Type</th>
               <th onClick={() => handleSort("bit_length")}>
                 Bit Length {renderSortIndicator("bit_length")}
               </th>
