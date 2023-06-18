@@ -9,9 +9,13 @@ export default function DataTable({ filter }) {
   const [cardData, setCardData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [sortColumn, setSortColumn] = useState("");
+  const [sortDirection, setSortDirection] = useState("");
 
   const streamerr = (error) => {
-    setError("Failed to fetch card data - check console log 👀");
+    setError(
+      "Failed to fetch card data. Check console logs for additional information."
+    );
     console.error(error.message);
   };
 
@@ -38,7 +42,9 @@ export default function DataTable({ filter }) {
           });
       })
       .catch((error) => {
-        setError("Failed to fetch card data - check console log 👀");
+        setError(
+          "Failed to fetch card data. Check console logs for additional information."
+        );
         console.error(error.message);
       });
     setIsLoading(false);
@@ -53,12 +59,28 @@ export default function DataTable({ filter }) {
     };
   }, []);
 
+  const handleSort = (column) => {
+    if (column === sortColumn) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortColumn(column);
+      setSortDirection("asc");
+    }
+  };
+
+  const renderSortIndicator = (column) => {
+    if (column === sortColumn) {
+      return <span>{sortDirection === "asc" ? "▲" : "▼"}</span>;
+    }
+    return null;
+  };
+
   const renderCardTypeImage = (cardType) => {
     switch (cardType) {
       case "hid":
         return (
           <img
-            class="h-auto max-w-xs mx-auto"
+            className="h-auto max-w-xs mx-auto"
             width="80px"
             src={hidLogo}
             alt="hid-logo"
@@ -67,7 +89,7 @@ export default function DataTable({ filter }) {
       case "gallagher":
         return (
           <img
-            class="h-auto max-w-xs mx-auto"
+            className="h-auto max-w-xs mx-auto"
             width="120px"
             src={gallagherLogo}
             alt="gallagher-logo"
@@ -76,36 +98,56 @@ export default function DataTable({ filter }) {
     }
   };
 
-  //const filteredCardData = useMemo(() =>
-  //  cardData.filter((card) => {
-  //    return card.card_number.toString().includes(Object.values({ filter }));
-  //  })
-  //);
-
   const filteredCardData = useMemo(
     () =>
       cardData.filter((card) => card.card_number.toString().includes(filter)),
     [cardData, filter]
   );
 
+  const sortedCardData = useMemo(() => {
+    if (sortColumn && sortDirection) {
+      const sortedData = [...filteredCardData].sort((a, b) => {
+        if (sortDirection === "asc") {
+          return a[sortColumn] - b[sortColumn];
+        } else {
+          return b[sortColumn] - a[sortColumn];
+        }
+      });
+      return sortedData;
+    }
+    return filteredCardData;
+  }, [filteredCardData, sortColumn, sortDirection]);
+
   const renderCardData = (
     <div className="overflow-x-auto">
-      {filteredCardData.length > 0 ? (
+      {sortedCardData.length > 0 ? (
         <table className="table w-full">
           <thead>
             <tr>
-              <th>Type</th>
-              <th>Bit Length</th>
-              <th>Region Code</th>
-              <th>Facility Code</th>
-              <th>Card Number</th>
-              <th>Issue Level</th>
+              <th onClick={() => handleSort("card_type")}>
+                Type {renderSortIndicator("card_type")}
+              </th>
+              <th onClick={() => handleSort("bit_length")}>
+                Bit Length {renderSortIndicator("bit_length")}
+              </th>
+              <th onClick={() => handleSort("region_code")}>
+                Region Code {renderSortIndicator("region_code")}
+              </th>
+              <th onClick={() => handleSort("facility_code")}>
+                Facility Code {renderSortIndicator("facility_code")}
+              </th>
+              <th onClick={() => handleSort("card_number")}>
+                Card Number {renderSortIndicator("card_number")}
+              </th>
+              <th onClick={() => handleSort("issue_level")}>
+                Issue Level {renderSortIndicator("issue_level")}
+              </th>
               <th>Hex</th>
               <th>Raw</th>
             </tr>
           </thead>
           <tbody>
-            {filteredCardData.map((item, index) => (
+            {sortedCardData.map((item, index) => (
               <tr key={index}>
                 <td>{renderCardTypeImage(item.card_type)}</td>
                 <td>{item.bit_length}</td>
@@ -165,29 +207,6 @@ export default function DataTable({ filter }) {
           </div>
         </div>
       )}
-    </div>
-  );
-
-  const renderNoCardData = (
-    <div className="flex justify-center items-center pt-6">
-      <div className="text-center">
-        <div className="alert alert-info">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            className="stroke-current shrink-0 w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            ></path>
-          </svg>
-          <span>No card data found.</span>
-        </div>
-      </div>
     </div>
   );
 
