@@ -15,12 +15,15 @@ export default function Settings() {
     try {
       const response = await fetch(url);
       if (!response.ok) {
-        setError("Network response was not ok");
+        setError("Network error - Check console logs for additional information.");
+        console.error(response.status);
       }
       return await response.json();
     } catch (error) {
-      setError(error);
-      throw error;
+      setError(
+      "API error - Check console logs for additional information."
+    );
+    console.error(error);
     }
   };
 
@@ -62,12 +65,16 @@ export default function Settings() {
       });
 
       if (!response.ok) {
-        setError("Network response was not ok");
+        setError("Network error - Check console logs for additional information.");
+        console.error(response.status);
       }
 
       return response.text();
     } catch (error) {
-      setError(error);
+      setError(
+      "API Error - Check console logs for additional information."
+    );
+    console.error(error);
     }
   };
 
@@ -86,8 +93,8 @@ export default function Settings() {
         postApiRequest("/api/device/reboot");
       })
       .catch((error) => {
-        setError(error);
-        toast.error(error);
+        setError("API Error - Check console logs for additional information.");
+        console.error(error);
       });
   };
 
@@ -97,7 +104,6 @@ export default function Settings() {
       toast.success(message);
     } catch (error) {
       // setError(error) already handled in the postApiRequest
-      toast.error(error);
     }
   };
 
