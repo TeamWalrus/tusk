@@ -2,7 +2,6 @@ import { Link, Route } from "wouter";
 import NavBar from "./components/NavBar";
 import Home from "./views/Home";
 import Settings from "./views/Settings";
-import { Toaster } from "react-hot-toast";
 import "./App.css";
 
 function App() {
@@ -14,7 +13,6 @@ function App() {
       </Route>
       <Route path="/settings">
         <Settings />
-        <Toaster />
       </Route>
     </div>
   );

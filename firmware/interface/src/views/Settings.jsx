@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import toast, { Toaster } from "react-hot-toast";
 import formatBytes from "../components/FormatBytes";
 import ErrorAlert from "../components/ErrorAlert";
 
@@ -9,7 +8,15 @@ export default function Settings() {
   const [sdcardinfo, setSDCardInfo] = useState([]);
   const [wificonfig, setWiFiConfig] = useState([]);
   const [error, setError] = useState("");
+  const [toastMessage, setToastMessage] = useState("");
   const form = useRef(null);
+
+  const showToast = (message, duration = 5000) => {
+    setToastMessage(message);
+    setTimeout(() => {
+      setToastMessage("");
+    }, duration);
+  };
 
   const fetchApiRequest = async (url) => {
     try {
@@ -89,7 +96,7 @@ export default function Settings() {
     })
       .then((response) => response.text())
       .then((message) => {
-        toast.success(message);
+        showToast(message);
         postApiRequest("/api/device/reboot");
       })
       .catch((error) => {
@@ -101,7 +108,7 @@ export default function Settings() {
   const deleteCardData = async () => {
     try {
       const message = await postApiRequest("/api/delete/carddata");
-      toast.success(message);
+      showToast(message);
     } catch (error) {
       // setError(error) already handled in the postApiRequest
     }
@@ -155,6 +162,13 @@ export default function Settings() {
     <div className="flex justify-center items-center m-6">
       <div className="text-center">
         <article className="prose lg:prose-xl">
+          {toastMessage && (
+            <div className="toast toast-top toast-center">
+              <div className="alert alert-success">
+                <span>{toastMessage}</span>
+              </div>
+            </div>
+          )}
           <div className="tabs">
             <a
               className={
