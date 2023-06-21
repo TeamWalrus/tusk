@@ -15,20 +15,9 @@ export default function Settings() {
   const [toastTimeout, setToastTimeout] = useState(null);
   const form = useRef(null);
 
-  const tabs = {
-    wifi_config: 1,
-    sd_card_info: 2,
-    little_fs_info: 3,
-  };
-
   const clearError = () => setError("");
 
-  const handleError = (message, error) => {
-    setError(message);
-    console.error(error);
-  };
-
-  const showToast = (message, duration = 5000) => {
+  const showToast = (message, duration = 4000) => {
     setToastMessage(message);
     clearTimeout(toastTimeout);
     const timeoutId = setTimeout(() => {
@@ -55,10 +44,11 @@ export default function Settings() {
       clearError();
       return response.text();
     } catch (error) {
-      handleError(
+      console.error(
         "API Error - Check console logs for additional information.",
         error
       );
+      throw error;
     }
   };
 
@@ -73,10 +63,11 @@ export default function Settings() {
       clearError();
       return await response.json();
     } catch (error) {
-      handleError(
+      console.error(
         "API Error - Check console logs for additional information.",
         error
       );
+      throw error;
     }
   };
 
@@ -85,7 +76,7 @@ export default function Settings() {
       const littlefsinfo = await fetchApiRequest("/api/littlefsinfo");
       setLittleFSinfo(littlefsinfo);
     } catch (error) {
-      // setError(error) already handled in the fetchApiRequest
+      setError("An error occurred while fetching LittleFS info.");
     }
   };
 
@@ -94,7 +85,7 @@ export default function Settings() {
       const sdcardinfo = await fetchApiRequest("/api/sdcardinfo");
       setSDCardInfo(sdcardinfo);
     } catch (error) {
-      // setError(error) already handled in the fetchApiRequest
+      setError("An error occurred while fetching SD Card info.");
     }
   };
 
@@ -103,7 +94,7 @@ export default function Settings() {
       const currentwificonfig = await fetchApiRequest("/api/wificonfig");
       setWiFiConfig(currentwificonfig);
     } catch (error) {
-      // setError(error) already handled in the fetchApiRequest
+      setError("An error occurred while fetching the WiFi config.");
     }
   };
 
@@ -122,10 +113,11 @@ export default function Settings() {
         postApiRequest("/api/device/reboot");
       })
       .catch((error) => {
-        handleError(
-          "Error updating wifi config - check logs for additional information.",
+        console.error(
+          "API Error - Check console logs for additional information.",
           error
         );
+        throw error;
       });
   };
 
@@ -134,7 +126,7 @@ export default function Settings() {
       const message = await postApiRequest("/api/delete/carddata");
       showToast(message);
     } catch (error) {
-      // setError(error) already handled in the postApiRequest
+      setError("An error occurred while deleting card data.");
     }
   };
 
