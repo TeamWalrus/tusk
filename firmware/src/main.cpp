@@ -271,11 +271,11 @@ void decode_cardax_125khz(String data)
   Serial.println();
 }
 
-/* #####----- Print bits function -----##### */
-void printBits() {
-  if (bitCount >= 26) { // ignore data caused by noise
-    Serial.print("card type: ");
-    Serial.println(cardType);
+// Print bits to serial (for debugging only)
+void printBits()
+{
+  if (bitCount >= 26)
+  { // ignore data caused by noise
     Serial.print("bit length: ");
     Serial.println(bitCount);
     Serial.println("facility code: ");
@@ -286,307 +286,141 @@ void printBits() {
   }
 }
 
-/* #####----- Process card format function -----##### */
-void getCardNumAndSiteCode() {
-  unsigned char i;
+// Process hid cards
+unsigned long decodeHIDFacilityCode(unsigned int start, unsigned int end)
+{
+  unsigned long HIDFacilityCode = 0;
+  unsigned int i;
+  for (i = start; i < end; i++)
+  {
+    HIDFacilityCode = (HIDFacilityCode << 1) | databits[i];
+  }
+  return HIDFacilityCode;
+}
 
+unsigned long decodeHIDCardCode(unsigned int start, unsigned int end) {
+  unsigned long HIDCardCode = 0;
+  unsigned int i;
+  for (i = start; i < end; i++) {
+    HIDCardCode = (HIDCardCode << 1) | databits[i];
+  }
+  return HIDCardCode;
+}
+
+void getCardNumAndSiteCode()
+{
   // bits to be decoded differently depending on card format length
   // see http://www.pagemac.com/projects/rfid/hid_data_formats for more info
   // also specifically: www.brivo.com/app/static_data/js/calculate.js
-  switch (bitCount) {
-
-  ///////////////////////////////////////
+  switch (bitCount) 
+  {
   // standard 26 bit format
-  // facility code = bits 2 to 9
   case 26:
     cardType = "hid";
-    for (i = 1; i < 9; i++) {
-      facilityCode <<= 1;
-      facilityCode |= databits[i];
-    }
-
-    // card code = bits 10 to 23
-    for (i = 9; i < 25; i++) {
-      cardCode <<= 1;
-      cardCode |= databits[i];
-    }
+    facilityCode = decodeHIDFacilityCode(1, 9);
+    cardCode = decodeHIDCardCode(9, 25);
     break;
 
-  ///////////////////////////////////////
   // 33 bit HID Generic
   case 33:
     cardType = "hid";
-    for (i = 1; i < 8; i++) {
-      facilityCode <<= 1;
-      facilityCode |= databits[i];
-    }
-
-    // card code
-    for (i = 8; i < 32; i++) {
-      cardCode <<= 1;
-      cardCode |= databits[i];
-    }
+    facilityCode = decodeHIDFacilityCode(1, 8);
+    cardCode = decodeHIDCardCode(8, 32);
     break;
 
-  ///////////////////////////////////////
   // 34 bit HID Generic
   case 34:
     cardType = "hid";
-    for (i = 1; i < 17; i++) {
-      facilityCode <<= 1;
-      facilityCode |= databits[i];
-    }
-
-    // card code
-    for (i = 17; i < 33; i++) {
-      cardCode <<= 1;
-      cardCode |= databits[i];
-    }
+    facilityCode = decodeHIDFacilityCode(1, 17);
+    cardCode = decodeHIDCardCode(17, 33);
     break;
 
-  ///////////////////////////////////////
   // 35 bit HID Corporate 1000 format
-  // facility code = bits 2 to 14
   case 35:
     cardType = "hid";
-    for (i = 2; i < 14; i++) {
-      facilityCode <<= 1;
-      facilityCode |= databits[i];
-    }
-
-    // card code = bits 15 to 34
-    for (i = 14; i < 34; i++) {
-      cardCode <<= 1;
-      cardCode |= databits[i];
-    }
+    facilityCode = decodeHIDFacilityCode(2, 14);
+    cardCode = decodeHIDCardCode(14, 34);
     break;
   }
   return;
 }
 
-/* #####----- Card value processing -----##### */
+// Card value processing functions
 // Function to append the card value (bitHolder1 and bitHolder2) to the
 // necessary array then translate that to the two chunks for the card value that
 // will be output
-void getCardValues() {
-  switch (bitCount) {
+void setCardChunkBits(unsigned int cardChunk1Offset, unsigned int bitHolderOffset, unsigned int cardChunk2Offset) {
+  for (int i = 19; i >= 0; i--) {
+    if (i == 13 || i == cardChunk1Offset) {
+      bitWrite(cardChunk1, i, 1);
+    } else if (i > cardChunk1Offset) {
+      bitWrite(cardChunk1, i, 0);
+    } else {
+      bitWrite(cardChunk1, i, bitRead(bitHolder1, i + bitHolderOffset));
+    }
+    if (i < bitHolderOffset) {
+      bitWrite(cardChunk2, i + cardChunk2Offset, bitRead(bitHolder1, i));
+    }
+    if (i < cardChunk2Offset) {
+      bitWrite(cardChunk2, i, bitRead(bitHolder2, i));
+    }
+  }
+}
+
+void getCardValues()
+{
+  switch (bitCount)
+  {
     // Example of full card value
     // |>   preamble   <| |>   Actual card value   <|
     // 000000100000000001 11 111000100000100100111000
     // |> write to chunk1 <| |>  write to chunk2   <|
-
   case 26:
-    for (int i = 19; i >= 0; i--) {
-      if (i == 13 || i == 2) {
-        bitWrite(cardChunk1, i, 1);
-      } else if (i > 2) {
-        bitWrite(cardChunk1, i, 0);
-      } else {
-        bitWrite(cardChunk1, i, bitRead(bitHolder1, i + 20));
-      }
-      if (i < 20) {
-        bitWrite(cardChunk2, i + 4, bitRead(bitHolder1, i));
-      }
-      if (i < 4) {
-        bitWrite(cardChunk2, i, bitRead(bitHolder2, i));
-      }
-    }
+    setCardChunkBits(2, 20, 4);
     break;
 
   case 27:
-    for (int i = 19; i >= 0; i--) {
-      if (i == 13 || i == 3) {
-        bitWrite(cardChunk1, i, 1);
-      } else if (i > 3) {
-        bitWrite(cardChunk1, i, 0);
-      } else {
-        bitWrite(cardChunk1, i, bitRead(bitHolder1, i + 19));
-      }
-      if (i < 19) {
-        bitWrite(cardChunk2, i + 5, bitRead(bitHolder1, i));
-      }
-      if (i < 5) {
-        bitWrite(cardChunk2, i, bitRead(bitHolder2, i));
-      }
-    }
+    setCardChunkBits(3, 19, 5);
     break;
 
   case 28:
-    for (int i = 19; i >= 0; i--) {
-      if (i == 13 || i == 4) {
-        bitWrite(cardChunk1, i, 1);
-      } else if (i > 4) {
-        bitWrite(cardChunk1, i, 0);
-      } else {
-        bitWrite(cardChunk1, i, bitRead(bitHolder1, i + 18));
-      }
-      if (i < 18) {
-        bitWrite(cardChunk2, i + 6, bitRead(bitHolder1, i));
-      }
-      if (i < 6) {
-        bitWrite(cardChunk2, i, bitRead(bitHolder2, i));
-      }
-    }
+    setCardChunkBits(4, 18, 6);
     break;
 
   case 29:
-    for (int i = 19; i >= 0; i--) {
-      if (i == 13 || i == 5) {
-        bitWrite(cardChunk1, i, 1);
-      } else if (i > 5) {
-        bitWrite(cardChunk1, i, 0);
-      } else {
-        bitWrite(cardChunk1, i, bitRead(bitHolder1, i + 17));
-      }
-      if (i < 17) {
-        bitWrite(cardChunk2, i + 7, bitRead(bitHolder1, i));
-      }
-      if (i < 7) {
-        bitWrite(cardChunk2, i, bitRead(bitHolder2, i));
-      }
-    }
+    setCardChunkBits(5, 17, 7);
     break;
 
   case 30:
-    for (int i = 19; i >= 0; i--) {
-      if (i == 13 || i == 6) {
-        bitWrite(cardChunk1, i, 1);
-      } else if (i > 6) {
-        bitWrite(cardChunk1, i, 0);
-      } else {
-        bitWrite(cardChunk1, i, bitRead(bitHolder1, i + 16));
-      }
-      if (i < 16) {
-        bitWrite(cardChunk2, i + 8, bitRead(bitHolder1, i));
-      }
-      if (i < 8) {
-        bitWrite(cardChunk2, i, bitRead(bitHolder2, i));
-      }
-    }
+    setCardChunkBits(6, 16, 8);
     break;
 
   case 31:
-    for (int i = 19; i >= 0; i--) {
-      if (i == 13 || i == 7) {
-        bitWrite(cardChunk1, i, 1);
-      } else if (i > 7) {
-        bitWrite(cardChunk1, i, 0);
-      } else {
-        bitWrite(cardChunk1, i, bitRead(bitHolder1, i + 15));
-      }
-      if (i < 15) {
-        bitWrite(cardChunk2, i + 9, bitRead(bitHolder1, i));
-      }
-      if (i < 9) {
-        bitWrite(cardChunk2, i, bitRead(bitHolder2, i));
-      }
-    }
+    setCardChunkBits(7, 15, 9);
     break;
 
   case 32:
-    for (int i = 19; i >= 0; i--) {
-      if (i == 13 || i == 8) {
-        bitWrite(cardChunk1, i, 1);
-      } else if (i > 8) {
-        bitWrite(cardChunk1, i, 0);
-      } else {
-        bitWrite(cardChunk1, i, bitRead(bitHolder1, i + 14));
-      }
-      if (i < 14) {
-        bitWrite(cardChunk2, i + 10, bitRead(bitHolder1, i));
-      }
-      if (i < 10) {
-        bitWrite(cardChunk2, i, bitRead(bitHolder2, i));
-      }
-    }
+    setCardChunkBits(8, 14, 10);
     break;
 
   case 33:
-    for (int i = 19; i >= 0; i--) {
-      if (i == 13 || i == 9) {
-        bitWrite(cardChunk1, i, 1);
-      } else if (i > 9) {
-        bitWrite(cardChunk1, i, 0);
-      } else {
-        bitWrite(cardChunk1, i, bitRead(bitHolder1, i + 13));
-      }
-      if (i < 13) {
-        bitWrite(cardChunk2, i + 11, bitRead(bitHolder1, i));
-      }
-      if (i < 11) {
-        bitWrite(cardChunk2, i, bitRead(bitHolder2, i));
-      }
-    }
+    setCardChunkBits(9, 13, 11);
     break;
 
   case 34:
-    for (int i = 19; i >= 0; i--) {
-      if (i == 13 || i == 10) {
-        bitWrite(cardChunk1, i, 1);
-      } else if (i > 10) {
-        bitWrite(cardChunk1, i, 0);
-      } else {
-        bitWrite(cardChunk1, i, bitRead(bitHolder1, i + 12));
-      }
-      if (i < 12) {
-        bitWrite(cardChunk2, i + 12, bitRead(bitHolder1, i));
-      }
-      if (i < 12) {
-        bitWrite(cardChunk2, i, bitRead(bitHolder2, i));
-      }
-    }
+    setCardChunkBits(10, 12, 12);
     break;
 
   case 35:
-    for (int i = 19; i >= 0; i--) {
-      if (i == 13 || i == 11) {
-        bitWrite(cardChunk1, i, 1);
-      } else if (i > 11) {
-        bitWrite(cardChunk1, i, 0);
-      } else {
-        bitWrite(cardChunk1, i, bitRead(bitHolder1, i + 11));
-      }
-      if (i < 11) {
-        bitWrite(cardChunk2, i + 13, bitRead(bitHolder1, i));
-      }
-      if (i < 13) {
-        bitWrite(cardChunk2, i, bitRead(bitHolder2, i));
-      }
-    }
+    setCardChunkBits(11, 11, 13);
     break;
 
   case 36:
-    for (int i = 19; i >= 0; i--) {
-      if (i == 13 || i == 12) {
-        bitWrite(cardChunk1, i, 1);
-      } else if (i > 12) {
-        bitWrite(cardChunk1, i, 0);
-      } else {
-        bitWrite(cardChunk1, i, bitRead(bitHolder1, i + 10));
-      }
-      if (i < 10) {
-        bitWrite(cardChunk2, i + 14, bitRead(bitHolder1, i));
-      }
-      if (i < 14) {
-        bitWrite(cardChunk2, i, bitRead(bitHolder2, i));
-      }
-    }
+    setCardChunkBits(12, 10, 14);
     break;
 
   case 37:
-    for (int i = 19; i >= 0; i--) {
-      if (i == 13) {
-        bitWrite(cardChunk1, i, 0);
-      } else {
-        bitWrite(cardChunk1, i, bitRead(bitHolder1, i + 9));
-      }
-      if (i < 9) {
-        bitWrite(cardChunk2, i + 15, bitRead(bitHolder1, i));
-      }
-      if (i < 15) {
-        bitWrite(cardChunk2, i, bitRead(bitHolder2, i));
-      }
-    }
+    setCardChunkBits(13, 9, 15);
     break;
   }
   return;
