@@ -69,6 +69,18 @@ Clients connect to the ESP32 over WiFi and view captured card credentials via a 
 │   │   └── build_interface.py  # helper script to build ahd deploy react webserver to /data/ folder
 ```
 
+## Build Instructions
+
+Change directory into `/firmware` and execute the following command:
+
+To build and upload the main backend code: 
+
+`pio run --target upload`
+
+To build and upload the frontend react webapp: 
+
+`pio run --target uploadfs`
+
 ## Captured card data format
 
 Captured card credentials are written to the sd card in newline-delimited JSON (`cards.jsonl`). For example:
