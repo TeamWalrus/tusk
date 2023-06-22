@@ -106,9 +106,9 @@ export default function DataTable({ filter }) {
   }, [filteredCardData, sortColumn, sortDirection]);
 
   const renderCardData = (
-    <div className="container">
+    <div>
       {sortedCardData.length > 0 ? (
-        <div className="container">
+        <div>
           <div className="overflow-x-auto hidden md:block">
             <table className="table w-full">
               <thead className="border-b-2">
