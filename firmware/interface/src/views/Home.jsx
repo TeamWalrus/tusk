@@ -9,10 +9,10 @@ export default function Home() {
       <div className="text-center">
         <div className="flex w-full justify-around items-center pb-5">
           <article className="prose lg:prose-xl">
-            <h4>Captured access card credentials are listed below 👇</h4>
+            <h4 className="ps-2">Captured access card credentials are listed below 👇</h4>
           </article>
           <div className="divider divider-horizontal"></div>
-          <div className="form-control">
+          <div className="form-control pe-2">
             <input
               type="text"
               className="input input-bordered input-primary"

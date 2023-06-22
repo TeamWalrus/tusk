@@ -1,6 +1,6 @@
 export default function InfoAlert({ message }) {
   return (
-    <div className="flex justify-center items-center pt-6">
+    <div className="flex justify-center items-center py-6 px-2">
       <div className="text-center">
         <div className="alert alert-info">
           <svg
