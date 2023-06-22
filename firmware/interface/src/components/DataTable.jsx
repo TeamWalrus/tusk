@@ -109,7 +109,7 @@ export default function DataTable({ filter }) {
     <div className="container">
       {sortedCardData.length > 0 ? (
         <div className="container">
-          <div className="overflow-x-auto rounded-lg shadow hidden md:block">
+          <div className="overflow-x-auto hidden md:block">
             <table className="table w-full">
               <thead className="border-b-2">
                 <tr>
@@ -163,7 +163,7 @@ export default function DataTable({ filter }) {
                         "p-1.5 text-xs font-bold uppercase tracking-wider rounded-lg " +
                         (item.card_type === "hid"
                           ? "bg-blue-700 text-white"
-                          : "bg-yellow-400 text-black")
+                          : "bg-amber-500 text-black")
                       }
                     >
                       {item.card_type}

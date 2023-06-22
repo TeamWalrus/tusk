@@ -139,7 +139,7 @@ export default function Settings() {
   return (
     <div className="flex justify-center items-center m-6">
       <div className="text-center">
-        <article className="prose lg:prose-xl">
+        <div className="prose sm:prose-xl">
           {toastMessage && (
             <div className="toast toast-top toast-center">
               <div className="alert alert-success">
@@ -169,7 +169,7 @@ export default function Settings() {
             {littlefsinfo && <LittleFSInfo tab={opentab} data={littlefsinfo} />}
             {error && <ErrorAlert message={error} />}
           </div>
-        </article>
+        </div>
       </div>
     </div>
   );
