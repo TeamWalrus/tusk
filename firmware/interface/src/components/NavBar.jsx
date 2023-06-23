@@ -31,7 +31,7 @@ export default function NavBar() {
     <nav>
       <div className="navbar bg-base-100 pt-4 pb-4">
         <div className="navbar-start">
-          <div className="dropdown">
+          <div className="dropdown ">
             <label tabIndex={0} className="btn btn-ghost btn-circle">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -50,7 +50,7 @@ export default function NavBar() {
             </label>
             <ul
               tabIndex={0}
-              className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
+              className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52 relative z-10"
             >
               <li>
                 <a href="/">Home</a>

@@ -137,7 +137,7 @@ export default function Settings() {
   }, []);
 
   return (
-    <div className="flex justify-center items-center m-6">
+    <div className="flex justify-center items-center p-2">
       <div className="text-center">
         <div className="prose sm:prose-xl">
           {toastMessage && (
@@ -147,7 +147,7 @@ export default function Settings() {
               </div>
             </div>
           )}
-          <div className="tabs">
+          <div className="tabs justify-center">
             {<SettingsTabs tab={opentab} onSetOpenTab={setOpenTab} />}
           </div>
           <div className="tabscontent pt-6">

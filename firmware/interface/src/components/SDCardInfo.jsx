@@ -14,7 +14,7 @@ export default function SDCardInfo({ tab, data, onDelete }) {
     >
       <div className="container">
         <div className="stats shadow">
-          <div className="stat place-items-center ">
+          <div className="stat place-items-center">
             <div className="stat-title text-info font-semibold">Total</div>
             <div className="stat-value">{prettysdcardinfototal}</div>
           </div>
