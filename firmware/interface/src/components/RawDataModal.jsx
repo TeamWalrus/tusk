@@ -3,7 +3,7 @@ export default function RawDataModal({ index, raw }) {
     <div>
       <label
         htmlFor={"rawdata_modal_" + index}
-        className="btn btn-sm btn-outline btn-info"
+        className="btn-info btn-outline btn-sm btn"
       >
         Show
       </label>

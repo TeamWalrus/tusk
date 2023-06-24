@@ -15,11 +15,11 @@ export default function LittleFSInfo({ tab, data }) {
       <div className="container">
         <div className="stats shadow">
           <div className="stat place-items-center ">
-            <div className="stat-title text-info font-semibold">Total</div>
+            <div className="stat-title font-semibold text-info">Total</div>
             <div className="stat-value">{prettylittlefsinfototal}</div>
           </div>
           <div className="stat place-items-center">
-            <div className="stat-title text-warning font-semibold">Used</div>
+            <div className="stat-title font-semibold text-warning">Used</div>
             <div className="stat-value">{prettylittlefsinfoused}</div>
           </div>
         </div>

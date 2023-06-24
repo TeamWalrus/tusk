@@ -74,16 +74,31 @@ export default function DataTable({ filter }) {
     }
   };
 
+  const SortableIndicator = (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="ml-1 h-3 w-3"
+      aria-hidden="true"
+      fill="currentColor"
+      viewBox="0 0 320 512"
+    >
+      <path d="M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z" />
+    </svg>
+  );
+
   const renderSortIndicator = (column) => {
     if (column === sortColumn) {
-      return <span>{sortDirection === "asc" ? "▲" : "▼"}</span>;
+      return <span className="ps-[3px]">{sortDirection === "asc" ? "▲" : "▼"}</span>;
     }
-    return null;
+    return SortableIndicator;
   };
 
   const renderCardTypeImage = (cardType) => {
     return <CardLogo cardType={cardType} />;
   };
+
+
+
 
   const filteredCardData = useMemo(
     () =>
@@ -109,27 +124,59 @@ export default function DataTable({ filter }) {
     <div>
       {sortedCardData.length > 0 ? (
         <div>
-          <div className="overflow-x-auto hidden md:block">
+          <div className="hidden overflow-x-auto md:block">
             <table className="table w-full">
-              <thead className="border-b-2">
+              <thead className="border-b-2 uppercase">
                 <tr>
                   <th>Type</th>
-                  <th onClick={() => handleSort("bit_length")}>
-                    Bit Length {renderSortIndicator("bit_length")}
+                  <th
+                    className="cursor-pointer"
+                    onClick={() => handleSort("bit_length")}
+                  >
+                    <div class="flex items-center">
+                      Bit Length {renderSortIndicator("bit_length")}
+                    </div>
                   </th>
-                  <th onClick={() => handleSort("region_code")}>
-                    Region Code {renderSortIndicator("region_code")}
+                  <th
+                    className="cursor-pointer"
+                    onClick={() => handleSort("region_code")}
+                  >
+                    <div class="flex items-center">
+                      Region Code {renderSortIndicator("region_code")}
+                    </div>
                   </th>
-                  <th onClick={() => handleSort("facility_code")}>
-                    Facility Code {renderSortIndicator("facility_code")}
+                  <th
+                    className="cursor-pointer"
+                    onClick={() => handleSort("facility_code")}
+                  >
+                    <div class="flex items-center">
+                      Facility Code {renderSortIndicator("facility_code")}
+                    </div>
                   </th>
-                  <th onClick={() => handleSort("card_number")}>
-                    Card Number {renderSortIndicator("card_number")}
+                  <th
+                    className="cursor-pointer"
+                    onClick={() => handleSort("card_number")}
+                  >
+                    <div class="flex items-center">
+                      Card Number {renderSortIndicator("card_number")}
+                    </div>
                   </th>
-                  <th onClick={() => handleSort("issue_level")}>
-                    Issue Level {renderSortIndicator("issue_level")}
+                  <th
+                    className="cursor-pointer"
+                    onClick={() => handleSort("issue_level")}
+                  >
+                    <div class="flex items-center">
+                      Issue Level {renderSortIndicator("issue_level")}
+                    </div>
                   </th>
-                  <th>Hex</th>
+                  <th
+                    className="cursor-pointer"
+                    onClick={() => handleSort("hex")}
+                  >
+                    <div class="flex items-center">
+                      Hex {renderSortIndicator("hex")}
+                    </div>
+                  </th>
                   <th>Raw</th>
                 </tr>
               </thead>
@@ -142,7 +189,7 @@ export default function DataTable({ filter }) {
                     <td>{item.facility_code}</td>
                     <td>{item.card_number}</td>
                     <td>{item.issue_level}</td>
-                    <td className="font-mono">{item.hex}</td>
+                    <td className="font-mono uppercase">{item.hex}</td>
                     <td>
                       <RawDataModal index={index} raw={item.raw} />
                     </td>
@@ -151,16 +198,16 @@ export default function DataTable({ filter }) {
               </tbody>
             </table>
           </div>
-          <div className="grid p-2 grid-cols-1 gap-4 md:hidden">
-            {sortedCardData.map((item, index) => (
-              <div className="space-y-3 p-4 rounded-lg shadow">
+          <div className="grid grid-cols-1 gap-4 p-2 md:hidden">
+            {sortedCardData.map((item) => (
+              <div className="space-y-3 rounded-lg p-4 shadow">
                 <div className="flex items-center space-x-4 text-sm">
                   <div>Bit: {item.bit_length}</div>
                   <div>Hex: {item.hex}</div>
                   <div>
                     <span
                       className={
-                        "p-1.5 text-xs font-bold uppercase tracking-wider rounded-lg " +
+                        "rounded-lg p-1.5 text-xs font-bold uppercase tracking-wider " +
                         (item.card_type === "hid"
                           ? "bg-blue-700 text-white"
                           : "bg-amber-500 text-black")

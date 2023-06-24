@@ -6,8 +6,8 @@ export default function Home() {
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:w-auto justify-center items-center">
-        <div className="prose sm:prose-xl px-2">
+      <div className="flex flex-col items-center justify-center sm:w-auto sm:flex-row">
+        <div className="prose px-2 sm:prose-xl">
           <h4 className="px-2">
             Captured access card credentials are listed below 👇
           </h4>
@@ -16,14 +16,14 @@ export default function Home() {
         <div className="form-control pt-4 sm:pt-0">
           <input
             type="text"
-            className="input input-bordered input-primary w-full sm:w-auto px-2 text-xs md:text-sm lg:text-base text-center"
+            className="input-bordered input-primary input w-full px-2 text-center text-xs sm:w-auto md:text-sm lg:text-base"
             placeholder="Search Card Number"
             value={filter}
             onChange={(event) => setFilter(event.target.value)}
           />
         </div>
       </div>
-      <div className="w-full justify-between items-center px-4 sm:px-0">
+      <div className="w-full items-center justify-between px-4 sm:px-0">
         <DataTable filter={filter} />
       </div>
     </div>

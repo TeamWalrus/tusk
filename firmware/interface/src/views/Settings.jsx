@@ -137,11 +137,11 @@ export default function Settings() {
   }, []);
 
   return (
-    <div className="flex justify-center items-center p-2">
+    <div className="flex items-center justify-center p-2">
       <div className="text-center">
         <div className="prose sm:prose-xl">
           {toastMessage && (
-            <div className="toast toast-top toast-center">
+            <div className="toast-center toast toast-top">
               <div className="alert alert-success">
                 <span>{toastMessage}</span>
               </div>

@@ -9,7 +9,7 @@ export default function SettingsTabs({ tab, onSetOpenTab }) {
     <div>
       <a
         className={
-          "tab tab-lifted " + (opentab === tabs.wifi_config ? "tab-active" : "")
+          "tab-lifted tab " + (opentab === tabs.wifi_config ? "tab-active" : "")
         }
         onClick={(e) => {
           e.preventDefault();
@@ -20,7 +20,7 @@ export default function SettingsTabs({ tab, onSetOpenTab }) {
       </a>
       <a
         className={
-          "tab tab-lifted " +
+          "tab-lifted tab " +
           (opentab === tabs.sd_card_info ? "tab-active" : "")
         }
         onClick={(e) => {
@@ -32,7 +32,7 @@ export default function SettingsTabs({ tab, onSetOpenTab }) {
       </a>
       <a
         className={
-          "tab tab-lifted " +
+          "tab-lifted tab " +
           (opentab === tabs.little_fs_info ? "tab-active" : "")
         }
         onClick={(e) => {

@@ -18,7 +18,7 @@ export default function WiFiConfig({ tab, config, form, onSubmit }) {
             placeholder={config.ssid}
             defaultValue={config.ssid}
             required
-            className="input input-bordered input-primary w-full max-w-xs"
+            className="input-bordered input-primary input w-full max-w-xs"
           />
           <label className="label">
             <span className="label-text">Password</span>
@@ -31,7 +31,7 @@ export default function WiFiConfig({ tab, config, form, onSubmit }) {
             defaultValue={config.password}
             required
             minLength={8}
-            className="input input-bordered input-primary w-full max-w-xs"
+            className="input-bordered input-primary input w-full max-w-xs"
           />
           <label className="label">
             <span className="label-text">Channel</span>
@@ -43,19 +43,19 @@ export default function WiFiConfig({ tab, config, form, onSubmit }) {
             placeholder={config.channel}
             defaultValue={config.channel}
             required
-            className="input input-bordered input-primary w-full max-w-xs"
+            className="input-bordered input-primary input w-full max-w-xs"
           />
-          <label className="label cursor-pointer pt-4 pb-4">
+          <label className="label cursor-pointer pb-4 pt-4">
             <span className="label-text">Hide SSID</span>
             <input
               id="hidessid"
               name="hidessid"
               type="checkbox"
-              className="toggle toggle-success"
+              className="toggle-success toggle"
               {...(config.hidessid === "0" ? "" : "defaultChecked")}
             />
           </label>
-          <button className="btn btn-success" value="submit">
+          <button className="btn-success btn" value="submit">
             Save & Reboot
           </button>
         </div>

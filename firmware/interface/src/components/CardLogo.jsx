@@ -6,7 +6,7 @@ export default function CardLogo({ cardType }) {
     case "hid":
       return (
         <img
-          className="h-auto max-w-xs mx-auto"
+          className="mx-auto h-auto max-w-xs"
           width="60px"
           src={hidLogo}
           alt="hid-logo"
@@ -15,7 +15,7 @@ export default function CardLogo({ cardType }) {
     case "gallagher":
       return (
         <img
-          className="h-auto max-w-xs mx-auto"
+          className="mx-auto h-auto max-w-xs"
           width="90px"
           src={gallagherLogo}
           alt="gallagher-logo"
