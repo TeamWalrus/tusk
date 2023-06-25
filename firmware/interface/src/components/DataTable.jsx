@@ -203,7 +203,7 @@ export default function DataTable({ filter }) {
                 <div className="flex w-full items-center text-sm">
                   <div className="flex w-full items-center">
                     <div className="text-sm font-semibold">Hex:</div>
-                    <div className="text-sm uppercase px-2">{" " + item.hex}</div>
+                    <div className="text-sm uppercase pl-0.5">{item.hex}</div>
                   </div>
                   <div
                     className={
@@ -213,28 +213,28 @@ export default function DataTable({ filter }) {
                         : "bg-amber-500 text-black")
                     }
                   >
-                    {" " + item.card_type}
+                    {item.card_type}
                   </div>
                 </div>
-                <div className="flex items-center text-sm">
+                <div className="flex items-center space-x-4 text-sm">
                   <div className="flex">
                     <div className="text-sm font-semibold">FC:</div>
-                    <div className="text-sm px-2">{" " + item.facility_code}</div>
+                    <div className="text-sm pl-0.5">{item.facility_code}</div>
                   </div>
                   <div className="flex">
                     <div className="text-sm font-semibold">CN:</div>
-                    <div className="text-sm px-2">{" " + item.card_number}</div>
+                    <div className="text-sm pl-0.5">{item.card_number}</div>
                   </div>
                   {item.region_code && (
                     <div className="flex">
                       <div className="text-sm font-semibold">RC:</div>
-                      <div className="text-sm px-2">{" " + item.region_code}</div>
+                      <div className="text-sm pl-0.5">{item.region_code}</div>
                     </div>
                   )}
                   {item.issue_level && (
                     <div className="flex">
                       <div className="text-sm font-semibold">IL:</div>
-                      <div className="text-sm px-2">{" " + item.issue_level}</div>
+                      <div className="text-sm pl-0.5">{item.issue_level}</div>
                     </div>
                   )}
                 </div>
