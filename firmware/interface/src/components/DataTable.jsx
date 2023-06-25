@@ -88,7 +88,9 @@ export default function DataTable({ filter }) {
 
   const renderSortIndicator = (column) => {
     if (column === sortColumn) {
-      return <span className="ps-[3px]">{sortDirection === "asc" ? "▲" : "▼"}</span>;
+      return (
+        <span className="ps-[3px]">{sortDirection === "asc" ? "▲" : "▼"}</span>
+      );
     }
     return SortableIndicator;
   };
@@ -96,9 +98,6 @@ export default function DataTable({ filter }) {
   const renderCardTypeImage = (cardType) => {
     return <CardLogo cardType={cardType} />;
   };
-
-
-
 
   const filteredCardData = useMemo(
     () =>
@@ -200,14 +199,16 @@ export default function DataTable({ filter }) {
           </div>
           <div className="grid grid-cols-1 gap-4 p-2 md:hidden">
             {sortedCardData.map((item) => (
-              <div className="space-y-3 rounded-lg p-4 shadow">
-                <div className="flex items-center space-x-4 text-sm">
-                  <div>Bit: {item.bit_length}</div>
-                  <div>Hex: {item.hex}</div>
+              <div className="space-y-3 rounded-lg border p-4">
+                <div className="flex w-full items-center text-sm">
+                  <div className="flex w-full items-center space-x-4">
+                    <div className="text-sm">Bit: {item.bit_length}</div>
+                    <div className="ps-2 text-sm">Hex: {item.hex}</div>
+                  </div>
                   <div>
                     <span
                       className={
-                        "rounded-lg p-1.5 text-xs font-bold uppercase tracking-wider " +
+                        "rounded-lg p-1.5 text-right text-sm font-semibold uppercase " +
                         (item.card_type === "hid"
                           ? "bg-blue-700 text-white"
                           : "bg-amber-500 text-black")
