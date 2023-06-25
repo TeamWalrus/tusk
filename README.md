@@ -11,7 +11,7 @@ The core functionality of the project remains the same: a tool that allows red t
 ## Overview of the upgrades
 
 | Component                  | Description                                                             |
-| -------------------------- | ----------------------------------------------------------------------- |
+|:-------------------------- |:----------------------------------------------------------------------- |
 | Microcontroller Unit (MCU) | Replace the Arduino with an ESP32                                       |
 | Batteries                  | Replace the AA with 27100's for the reader and 18650's for the MCU      |
 | Wireless Connectivity      | The ESP32 has built-in WiFI capability                                  |
@@ -22,6 +22,65 @@ The core functionality of the project remains the same: a tool that allows red t
 \* One of the main issues with all previous build's I've seen, is the electronic components (microcontroller unit, buck converter and batteries) being housed inside the RFID reader. These components (specifically buck converters) create a lot of 'RF noise' - which interfere with the finely tuned RFID readers. This reduces the effective range of the reader, which can be the difference between capturing access card credentials or not. Housing these components externally, ensures the device operates at it's advertised range capability.
 
 ![tusk-pcb](/images/tusk-pcb-v0-3.jpg)
+
+## Overview of the project structure
+
+```
+├── firmware                    # 
+│   ├── interface               # react frontend web application
+│   │   └── src
+│   ├── data                    # build path of the react frontend
+│   ├── src
+│   │   └── main.cpp            # backend webserver + card handling code
+│   ├── scripts
+│   │   └── build_interface.py  # helper script to deploy react frontend to build path
+├── hardware                    # gerber files, BOM, etc
+├── enclosure                   # enclosure files for 3d printing
+```
+
+
+## Build instructions: hardware
+
+Gerber files, BOM, and Pick and Place files required to get the PCB manufactured can be found in the `/hardware` directory. This is a PCB that houses the batteries for the long range reader, ESP32 microcontroller unit, and sd-card reader.
+
+The tusk PCB uses 5 x 27100 li-ion batteries slots that will power the long range reader. That means the output voltage is 4.2V x 5 = 21V. This should be within the operating voltage for the long range readers listed above. However, I recommend checking this before hooking up your reader.
+
+Once the PCB is assembled: 
+
+- Connect the power from the PCB -> positive (+) and negative (-) from the block connector to the external reader
+- Connect the data lines (`data0` and `data1`) from the block connector to the external reader
+
+**Note**: the ESP32 footprint on the PCB is for an ESP32-DevKitC-V4. Older ESP32-DevKit-V1 will not fit.
+
+![devkitv1-vs-devkitv4](/images/devkitv1-vs-devkitv4.jpg)
+
+## Build instructions: firmware
+
+| Component                | Description                                                 |
+|:------------------------ |:----------------------------------------------------------- |
+| `/firmware/src/main.cpp` | backend webserver and access card credentials handling code |
+| `/firmware/interface/`   | react frontend to display captured access card credentials  |
+
+Change directory into `/firmware` and execute the following commands to flash the ESP32 firmware:
+
+To build and upload the backend code: 
+
+`pio run --target upload`
+
+To build and upload the frontend react webapp: 
+
+`pio run --target uploadfs`
+
+
+### Tusk web interface
+
+Clients connect to the ESP32 over WiFi and view captured card credentials via a react web application. The default values are as follows:
+
+| Component     | Details                |
+|:------------- |:---------------------- |
+| WiFi SSID     | `Tusk`                 |
+| WiFi Password | `changemepls`          |
+| URL           | `http://192.168.100.1` |
 
 ## Acknowledgments
 
@@ -41,47 +100,7 @@ Thanks to my employer [Aura Information Security](https://www.aurainfosec.com/) 
 
 ![aura-logo](https://user-images.githubusercontent.com/27876907/188373880-8157648c-eb94-4054-81c8-7c61692b0367.png)
 
-
-# Hardware
-
-Gerber files, BOM, and Pick and Place files required to get the PCB manufactured. This is a PCB that houses the batteries for the long range reader, ESP32 microcontroller unit, and sd-card reader.
-
-The tusk PCB has 5 x 27100 li-ion batteries slots that will power the long range reader. That means the output voltage is 4.2V x 5 = 21V. This should be within the operating voltage of the long range readers listed above. However, I recommend checking this before hooking up your reader.
-
-**Note**: the ESP32 footprint on the PCB is for an ESP32-DevKitC-V4. Older ESP32-DevKit-V1 will not fit.
-
-![devkitv1-vs-devkitv4](/images/devkitv1-vs-devkitv4.jpg)
-
-# Firmware & Software
-
-Clients connect to the ESP32 over WiFi and view captured card credentials via a react web application.
-
-## Overview of the project structure
-
-```
-├── firmware
-│   ├── interface               # react frontend web application
-│   │   └── src
-│   ├── data                    # build path of the react frontend
-│   ├── src
-│   │   └── main.cpp            # backend webserver
-│   ├── scripts
-│   │   └── build_interface.py  # helper script to build ahd deploy react webserver to /data/ folder
-```
-
-## Build Instructions
-
-Change directory into `/firmware` and execute the following command:
-
-To build and upload the main backend code: 
-
-`pio run --target upload`
-
-To build and upload the frontend react webapp: 
-
-`pio run --target uploadfs`
-
-## Captured card data format
+## Captured access card credentials format
 
 Captured card credentials are written to the sd card in newline-delimited JSON (`cards.jsonl`). For example:
 
@@ -90,6 +109,6 @@ Captured card credentials are written to the sd card in newline-delimited JSON (
 {"card_type":"gallagher","region_code":4,"bit_length":46,"facility_code":2222,"card_number":1111,"issue_level":3,"hex":"A38A8A4BA3A3A32C","raw":"101000110100010101100010101010010110101000110101000110101000110001011001"}
 ```
 
-# Enclosure
+## Enclosure
 
 3D printed enclosure files
