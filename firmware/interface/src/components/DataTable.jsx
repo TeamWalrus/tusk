@@ -202,30 +202,40 @@ export default function DataTable({ filter }) {
               <div className="space-y-3 rounded-lg border p-4">
                 <div className="flex w-full items-center text-sm">
                   <div className="flex w-full items-center space-x-4">
-                    <div className="text-sm">Bit: {item.bit_length}</div>
-                    <div className="ps-2 text-sm">Hex: {item.hex}</div>
+                    <div className="text-sm font-semibold">Hex:</div>
+                    <div className="text-sm uppercase">{" " + item.hex}</div>
                   </div>
-                  <div>
-                    <span
-                      className={
-                        "rounded-lg p-1.5 text-right text-sm font-semibold uppercase " +
-                        (item.card_type === "hid"
-                          ? "bg-blue-700 text-white"
-                          : "bg-amber-500 text-black")
-                      }
-                    >
-                      {item.card_type}
-                    </span>
+                  <div
+                    className={
+                      "badge font-semibold uppercase " +
+                      (item.card_type === "hid"
+                        ? "bg-blue-700 text-white"
+                        : "bg-amber-500 text-black")
+                    }
+                  >
+                    {" " + item.card_type}
                   </div>
                 </div>
                 <div className="flex items-center space-x-4 text-sm">
                   {item.region_code && (
-                    <div className="text-sm">RC: {item.region_code}</div>
+                    <div className="flex">
+                      <div className="text-sm font-semibold">RC:</div>
+                      <div className="text-sm">{" " + item.region_code}</div>
+                    </div>
                   )}
-                  <div className="text-sm">FC: {item.facility_code}</div>
-                  <div className="text-sm">CN: {item.card_number}</div>
+                  <div className="flex">
+                    <div className="text-sm font-semibold">FC:</div>
+                    <div className="text-sm">{" " + item.facility_code}</div>
+                  </div>
+                  <div className="flex">
+                    <div className="text-sm font-semibold">CN:</div>
+                    <div className="text-sm">{" " + item.card_number}</div>
+                  </div>
                   {item.issue_level && (
-                    <div className="text-sm">IL: {item.issue_level}</div>
+                    <div className="flex">
+                      <div className="text-sm font-semibold">IL:</div>
+                      <div className="text-sm">{" " + item.issue_level}</div>
+                    </div>
                   )}
                 </div>
               </div>
