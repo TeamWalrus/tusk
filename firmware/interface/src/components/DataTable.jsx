@@ -201,9 +201,9 @@ export default function DataTable({ filter }) {
             {sortedCardData.map((item) => (
               <div className="space-y-3 rounded-lg border p-4">
                 <div className="flex w-full items-center text-sm">
-                  <div className="flex w-full items-center space-x-4">
+                  <div className="flex w-full items-center">
                     <div className="text-sm font-semibold">Hex:</div>
-                    <div className="text-sm uppercase">{" " + item.hex}</div>
+                    <div className="text-sm uppercase px-2">{" " + item.hex}</div>
                   </div>
                   <div
                     className={
@@ -216,25 +216,25 @@ export default function DataTable({ filter }) {
                     {" " + item.card_type}
                   </div>
                 </div>
-                <div className="flex items-center space-x-4 text-sm">
-                  {item.region_code && (
-                    <div className="flex">
-                      <div className="text-sm font-semibold">RC:</div>
-                      <div className="text-sm">{" " + item.region_code}</div>
-                    </div>
-                  )}
+                <div className="flex items-center text-sm">
                   <div className="flex">
                     <div className="text-sm font-semibold">FC:</div>
-                    <div className="text-sm">{" " + item.facility_code}</div>
+                    <div className="text-sm px-2">{" " + item.facility_code}</div>
                   </div>
                   <div className="flex">
                     <div className="text-sm font-semibold">CN:</div>
-                    <div className="text-sm">{" " + item.card_number}</div>
+                    <div className="text-sm px-2">{" " + item.card_number}</div>
                   </div>
+                  {item.region_code && (
+                    <div className="flex">
+                      <div className="text-sm font-semibold">RC:</div>
+                      <div className="text-sm px-2">{" " + item.region_code}</div>
+                    </div>
+                  )}
                   {item.issue_level && (
                     <div className="flex">
                       <div className="text-sm font-semibold">IL:</div>
-                      <div className="text-sm">{" " + item.issue_level}</div>
+                      <div className="text-sm px-2">{" " + item.issue_level}</div>
                     </div>
                   )}
                 </div>
