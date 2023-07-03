@@ -30,6 +30,10 @@ IPAddress subnet(255, 255, 255, 0);
 // Define CS pin for the SD card module
 const int sd_cs = 5;
 
+// General device settings
+bool isCapturing = true;
+String version = "0.1";
+
 // Webserver config /
 AsyncWebServer server(80);
 
@@ -597,7 +601,7 @@ void setup() {
     request->send(response);
   });
 
-  server.on("/api/littlefsinfo", HTTP_GET, [](AsyncWebServerRequest *request) {
+  server.on("/api/device/littlefsinfo", HTTP_GET, [](AsyncWebServerRequest *request) {
     AsyncResponseStream *response =
         request->beginResponseStream("application/json");
     DynamicJsonDocument json(512);
@@ -607,7 +611,7 @@ void setup() {
     request->send(response);
   });
 
-  server.on("/api/sdcardinfo", HTTP_GET, [](AsyncWebServerRequest *request) {
+  server.on("/api/device/sdcardinfo", HTTP_GET, [](AsyncWebServerRequest *request) {
     AsyncResponseStream *response =
         request->beginResponseStream("application/json");
     DynamicJsonDocument json(512);
@@ -635,7 +639,7 @@ void setup() {
     request->send(response);
   });
 
-  server.on("/api/delete/carddata", HTTP_POST,
+  server.on("/api/carddata", HTTP_POST,
             [](AsyncWebServerRequest *request) {
               writeSDFile(jsoncarddataPath, "");
               lastWrittenBitCount = 0;
@@ -647,7 +651,7 @@ void setup() {
               request->send(response);
             });
 
-  server.on("/api/wificonfig", HTTP_GET,
+  server.on("/api/device/wificonfig", HTTP_GET,
             [](AsyncWebServerRequest *request) {
               AsyncResponseStream *response =
                   request->beginResponseStream("application/json");
@@ -661,7 +665,7 @@ void setup() {
             });
 
   server.on(
-      "/api/wificonfig/update", HTTP_POST, [](AsyncWebServerRequest *request) {
+      "/api/device/wificonfig", HTTP_POST, [](AsyncWebServerRequest *request) {
         int params = request->params();
         for (int i = 0; i < params; i++) {
           AsyncWebParameter *p = request->getParam(i);
@@ -702,6 +706,40 @@ void setup() {
       ESP.restart(); 
     });
 
+  server.on("/api/device/settings/general", HTTP_GET,
+            [](AsyncWebServerRequest *request)
+            {
+              AsyncResponseStream *response =
+                  request->beginResponseStream("application/json");
+              DynamicJsonDocument json(200);
+              json["capturing"] = isCapturing;
+              json["version"] = version;
+              serializeJson(json, *response);
+              request->send(response);
+            });
+
+  server.on(
+      "/api/device/settings/general", HTTP_POST, [](AsyncWebServerRequest *request)
+      {
+        int params = request->params();
+        for (int i = 0; i < params; i++) {
+          AsyncWebParameter *p = request->getParam(i);
+          if (p->isPost()) {
+            if (p->name() == "capturing") {
+              String newCapturingState = p->value().c_str();
+              if (newCapturingState == "true") {
+                isCapturing = true;
+              } else if (newCapturingState == "false") {
+                isCapturing = false;
+              }
+            }
+            Serial.printf("[+] Webserver: FormData - [%s]: %s\n", p->name().c_str(),
+                          p->value().c_str());
+          }
+        }
+      request->send(200, "text/plain", "General settings updated"); 
+      });
+
   server.onNotFound([](AsyncWebServerRequest *request) { request->send(404); });
 
   server.begin();
@@ -714,55 +752,63 @@ void setup() {
 }
 
 void loop() {
-  if (!flagDone) {
-    if (--weigandCounter == 0)
-      flagDone = 1;
-  }
+  if (isCapturing) {
 
-  // if there are bits and the weigand counter went out
-  if (bitCount > 0 && flagDone) {
-    unsigned char i;
+    if (!flagDone) {
+      if (--weigandCounter == 0)
+        flagDone = 1;
+    }
 
-    // check if the newly read card's bits are the same as the previously
-    // written card's bits
-    bool same = true;
-    if (bitCount == lastWrittenBitCount) {
-      for (i = 0; i < bitCount; i++) {
-        if (databits[i] != lastWrittenDatabits[i]) {
-          same = false;
-          break;
+    // if there are bits and the weigand counter went out
+    if (bitCount > 0 && flagDone) {
+      unsigned char i;
+
+      // check if the newly read card's bits are the same as the previously
+      // written card's bits
+      bool same = true;
+      if (bitCount == lastWrittenBitCount) {
+        for (i = 0; i < bitCount; i++) {
+          if (databits[i] != lastWrittenDatabits[i]) {
+            same = false;
+            break;
+          }
+        }
+      } else {
+        same = false;
+      }
+
+      if (!same) {
+        getCardValues();
+        getCardNumAndSiteCode();
+
+        printBits();
+
+        writeSD();
+
+        lastWrittenBitCount = bitCount;
+        for (i = 0; i < bitCount; i++) {
+          lastWrittenDatabits[i] = databits[i];
         }
       }
-    } else {
-      same = false;
-    }
 
-    if (!same) {
-      getCardValues();
-      getCardNumAndSiteCode();
+      // cleanup and get ready for the next card
+      cardType = "";
+      bitCount = 0;
+      facilityCode = 0;
+      cardCode = 0;
+      bitHolder1 = 0;
+      bitHolder2 = 0;
+      cardChunk1 = 0;
+      cardChunk2 = 0;
 
-      printBits();
-
-      writeSD();
-
-      lastWrittenBitCount = bitCount;
-      for (i = 0; i < bitCount; i++) {
-        lastWrittenDatabits[i] = databits[i];
+      for (i = 0; i < MAX_BITS; i++) {
+        databits[i] = 0;
       }
     }
 
-    // cleanup and get ready for the next card
-    cardType = "";
-    bitCount = 0;
-    facilityCode = 0;
-    cardCode = 0;
-    bitHolder1 = 0;
-    bitHolder2 = 0;
-    cardChunk1 = 0;
-    cardChunk2 = 0;
-
-    for (i = 0; i < MAX_BITS; i++) {
-      databits[i] = 0;
-    }
+  } else {
+    // not capturing data - do nothing
+    Serial.println("[!] Not capturing data");
+    delay(60000);
   }
 }

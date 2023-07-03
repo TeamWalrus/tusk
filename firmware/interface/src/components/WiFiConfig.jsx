@@ -1,12 +1,54 @@
-export default function WiFiConfig({ tab, config, form, onSubmit }) {
-  const wifi_config_tab = 1;
+import React, { useState, useEffect, useRef } from "react";
+import { postApiRequest, fetchApiRequest } from '../helpers/api';
+
+export default function WiFiConfig({ tab, showToast, setError}) {
+  const wifi_config_tab = 2;
   const opentab = tab;
+  const [wificonfig, setWiFiConfig] = useState([]);
+  const form = useRef(null);
+
+  const getWiFiConfig = async () => {
+    try {
+      const response = await fetchApiRequest("/api/device/wificonfig");
+      setWiFiConfig(response);
+    } catch (error) {
+      setError("An error occurred while fetching the WiFi config.");
+      console.error(error);
+    }
+  };
+
+  const submitWiFiUpdate = async (event) => {
+    event.preventDefault();
+    fetch("/api/device/wificonfig", {
+      method: "POST",
+      body: new URLSearchParams(new FormData(form.current)),
+      headers: {
+        "Content-type": "application/x-www-form-urlencoded",
+      },
+    })
+      .then((response) => response.text())
+      .then((message) => {
+        showToast(message);
+        postApiRequest("/api/device/reboot");
+      })
+      .catch((error) => {
+        setError(
+          "API Error - Check console logs for additional information."
+        );
+        console.error(error);
+      });
+  };
+
+  useEffect(() => {
+    getWiFiConfig();
+  }, []);
+
   return (
     <div
       id="tab_wificonfig"
       className={opentab === wifi_config_tab ? "block" : "hidden"}
     >
-      <form ref={form} onSubmit={onSubmit}>
+      <form ref={form} onSubmit={submitWiFiUpdate}>
         <div className="form-control w-full max-w-xs">
           <label className="label">
             <span className="label-text">Name (SSID)</span>
@@ -15,8 +57,8 @@ export default function WiFiConfig({ tab, config, form, onSubmit }) {
             id="ssid"
             name="ssid"
             type="text"
-            placeholder={config.ssid}
-            defaultValue={config.ssid}
+            placeholder={wificonfig.ssid}
+            defaultValue={wificonfig.ssid}
             required
             className="input-bordered input-primary input w-full max-w-xs"
           />
@@ -28,7 +70,7 @@ export default function WiFiConfig({ tab, config, form, onSubmit }) {
             name="password"
             type="password"
             placeholder="********"
-            defaultValue={config.password}
+            defaultValue={wificonfig.password}
             required
             minLength={8}
             className="input-bordered input-primary input w-full max-w-xs"
@@ -40,8 +82,8 @@ export default function WiFiConfig({ tab, config, form, onSubmit }) {
             id="channel"
             name="channel"
             type="text"
-            placeholder={config.channel}
-            defaultValue={config.channel}
+            placeholder={wificonfig.channel}
+            defaultValue={wificonfig.channel}
             required
             className="input-bordered input-primary input w-full max-w-xs"
           />
@@ -51,8 +93,8 @@ export default function WiFiConfig({ tab, config, form, onSubmit }) {
               id="hidessid"
               name="hidessid"
               type="checkbox"
-              className="toggle-success toggle"
-              {...(config.hidessid === "0" ? "" : "defaultChecked")}
+              className={`toggle-success toggle ${wificonfig.hidessid === "0" ? "" : "defaultChecked"}`}
+              //checked={Boolean(config.hidessid)}
             />
           </label>
           <button className="btn-success btn" value="submit">

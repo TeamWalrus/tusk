@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import tuskLogo from "../assets/logo.png";
+import { DeviceSettingsContext } from "./DeviceSettingsProvider";
 
 export default function NavBar() {
   const [theme, setTheme] = useState("night");
+  const { deviceSettings, getDeviceSettings } = useContext(
+    DeviceSettingsContext
+  );
 
   const setThemePref = (pref) => {
     localStorage.setItem("theme", pref);
@@ -26,6 +30,10 @@ export default function NavBar() {
     const body = document.documentElement;
     body.setAttribute("data-theme", theme);
   }, [theme]);
+
+  useEffect(() => {
+    getDeviceSettings();
+  }, [deviceSettings]);
 
   return (
     <nav>
@@ -66,6 +74,13 @@ export default function NavBar() {
           <a className="btn-ghost btn text-xl normal-case">Tusk</a>
         </div>
         <div className="navbar-end">
+          <div
+            className={`badge badge-lg pr-4 ${
+              deviceSettings.capturing ? "badge-success" : "badge-error"
+            }`}
+          >
+            {deviceSettings.capturing ? "Active" : "Inactive"}
+          </div>
           <label className="swap swap-rotate mx-6">
             <input onClick={toggleTheme} type="checkbox" />
             <svg

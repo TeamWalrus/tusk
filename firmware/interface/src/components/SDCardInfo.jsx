@@ -1,9 +1,38 @@
+import React, { useState, useEffect } from "react";
 import formatBytes from "./FormatBytes";
+import { postApiRequest, fetchApiRequest } from "../helpers/api";
 
-export default function SDCardInfo({ tab, data, onDelete }) {
-  const sd_card_info_tab = 2;
+export default function SDCardInfo({ tab, showToast, setError }) {
+  const sd_card_info_tab = 3;
   const opentab = tab;
-  const { totalBytes: sdcardTotalBytes, usedBytes: sdcardUsedBytes } = data;
+  const [sdcardinfo, setSDCardInfo] = useState([]);
+
+  const getSDCardInfo = async () => {
+    try {
+      const response = await fetchApiRequest("/api/device/sdcardinfo");
+      setSDCardInfo(response);
+    } catch (error) {
+      setError("An error occurred while fetching SD Card info.");
+      console.error(error);
+    }
+  };
+
+  const deleteCardData = async () => {
+    try {
+      const message = await postApiRequest("/api/carddata");
+      showToast(message);
+    } catch (error) {
+      setError("An error occurred while deleting card data.");
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    getSDCardInfo();
+  }, []);
+
+  const { totalBytes: sdcardTotalBytes, usedBytes: sdcardUsedBytes } =
+    sdcardinfo;
   const prettysdcardinfototal = formatBytes(sdcardTotalBytes);
   const prettysdcardinfoused = formatBytes(sdcardUsedBytes);
 
@@ -49,7 +78,7 @@ export default function SDCardInfo({ tab, data, onDelete }) {
                 htmlFor="confirm-delete-modal"
                 className="btn-error btn"
                 onClick={() => {
-                  onDelete();
+                  deleteCardData();
                 }}
               >
                 Delete
