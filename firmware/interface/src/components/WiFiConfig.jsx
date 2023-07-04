@@ -91,7 +91,7 @@ export default function WiFiConfig({
             required
             className="input-bordered input-primary input w-full max-w-xs"
           />
-          <label className="label cursor-pointer pb-4 pt-4">
+          <label className="label cursor-pointer py-4">
             <span className="label-text">Hide SSID</span>
             <input
               id="hidessid"

@@ -8,9 +8,7 @@ export default function Home() {
     <div>
       <div className="flex flex-col items-center justify-center sm:w-auto sm:flex-row">
         <div className="prose px-2 sm:prose-xl">
-          <h4 className="px-2">
-            Captured access card credentials are listed below 👇
-          </h4>
+          <h4>Captured access card credentials are listed below 👇</h4>
         </div>
         <div className="divider divider-horizontal"></div>
         <div className="form-control pt-4 sm:pt-0">
