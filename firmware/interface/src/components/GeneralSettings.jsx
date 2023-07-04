@@ -3,9 +3,9 @@ import formatBytes from "./FormatBytes";
 import { fetchApiRequest } from "../helpers/api";
 import { DeviceSettingsContext } from "./DeviceSettingsProvider";
 
-export default function GeneralSettings({ tab, setError }) {
+export default function GeneralSettings({ currentTab, setErrorMessage }) {
   const general_settings = 1;
-  const opentab = tab;
+  const opentab = currentTab;
   const { deviceSettings, setDeviceSettings, getDeviceSettings } = useContext(
     DeviceSettingsContext
   );
@@ -16,7 +16,7 @@ export default function GeneralSettings({ tab, setError }) {
       const response = await fetchApiRequest("/api/device/littlefsinfo");
       setLittleFSinfo(response);
     } catch (error) {
-      setError("An error occurred while fetching LittleFS info.");
+      setErrorMessage("An error occurred while fetching LittleFS info.");
       console.error(error);
     }
   };
@@ -46,7 +46,7 @@ export default function GeneralSettings({ tab, setError }) {
         capturing: newCapturingState,
       }));
     } catch (error) {
-      setError("An error occurred while updating capturing setting:");
+      setErrorMessage("An error occurred while updating capturing setting:");
       console.error(error);
     }
   };

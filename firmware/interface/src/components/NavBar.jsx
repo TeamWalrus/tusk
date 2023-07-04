@@ -33,7 +33,7 @@ export default function NavBar() {
 
   useEffect(() => {
     getDeviceSettings();
-  }, [deviceSettings]);
+  }, []);
 
   return (
     <nav>

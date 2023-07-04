@@ -10,13 +10,13 @@ function App() {
     <div className="App">
       <DeviceSettingsProvider>
         <NavBar />
+        <Route path="/">
+          <Home />
+        </Route>
+        <Route path="/settings">
+          <Settings />
+        </Route>
       </DeviceSettingsProvider>
-      <Route path="/">
-        <Home />
-      </Route>
-      <Route path="/settings">
-        <Settings />
-      </Route>
     </div>
   );
 }

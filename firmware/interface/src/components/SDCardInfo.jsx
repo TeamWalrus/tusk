@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import formatBytes from "./FormatBytes";
 import { postApiRequest, fetchApiRequest } from "../helpers/api";
 
-export default function SDCardInfo({ tab, showToast, setError }) {
+export default function SDCardInfo({ currentTab, showToastMessage, setErrorMessage }) {
   const sd_card_info_tab = 3;
-  const opentab = tab;
+  const opentab = currentTab;
   const [sdcardinfo, setSDCardInfo] = useState([]);
 
   const getSDCardInfo = async () => {
@@ -12,7 +12,7 @@ export default function SDCardInfo({ tab, showToast, setError }) {
       const response = await fetchApiRequest("/api/device/sdcardinfo");
       setSDCardInfo(response);
     } catch (error) {
-      setError("An error occurred while fetching SD Card info.");
+      setErrorMessage("An error occurred while fetching SD Card info.");
       console.error(error);
     }
   };
@@ -20,9 +20,9 @@ export default function SDCardInfo({ tab, showToast, setError }) {
   const deleteCardData = async () => {
     try {
       const message = await postApiRequest("/api/carddata");
-      showToast(message);
+      showToastMessage(message);
     } catch (error) {
-      setError("An error occurred while deleting card data.");
+      setErrorMessage("An error occurred while deleting card data.");
       console.error(error);
     }
   };

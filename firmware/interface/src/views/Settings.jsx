@@ -7,12 +7,12 @@ import SettingsTabs from "../components/SettingsTabs";
 import { DeviceSettingsProvider } from "../components/DeviceSettingsProvider";
 
 export default function Settings() {
-  const [opentab, setOpenTab] = useState(1);
-  const [error, setError] = useState("");
+  const [currentTab, setCurrentTab] = useState(1);
+  const [errorMessage, setErrorMessage] = useState("");
   const [toastMessage, setToastMessage] = useState("");
   const [toastTimeout, setToastTimeout] = useState(null);
 
-  const showToast = (message, duration = 4000) => {
+  const showToastMessage = (message, duration = 4000) => {
     setToastMessage(message);
     clearTimeout(toastTimeout);
     const timeoutId = setTimeout(() => {
@@ -33,27 +33,30 @@ export default function Settings() {
             </div>
           )}
           <div className="tabs justify-center">
-            {<SettingsTabs tab={opentab} setOpenTab={setOpenTab} />}
+            {
+              <SettingsTabs
+                currentTab={currentTab}
+                setCurrentTab={setCurrentTab}
+              />
+            }
           </div>
           <div className="tabscontent pt-6">
-            <DeviceSettingsProvider>
-              <GeneralSettings
-                tab={opentab}
-                showToast={showToast}
-                setError={setError}
-              />
-            </DeviceSettingsProvider>
+            <GeneralSettings
+              currentTab={currentTab}
+              showToastMessage={showToastMessage}
+              setErrorMessage={setErrorMessage}
+            />
             <WiFiConfig
-              tab={opentab}
-              showToast={showToast}
-              setError={setError}
+              currentTab={currentTab}
+              showToastMessage={showToastMessage}
+              setErrorMessage={setErrorMessage}
             />
             <SDCardInfo
-              tab={opentab}
-              showToast={showToast}
-              setError={setError}
+              currentTab={currentTab}
+              showToastMessage={showToastMessage}
+              setErrorMessage={setErrorMessage}
             />
-            {error && <ErrorAlert message={error} />}
+            {errorMessage && <ErrorAlert message={errorMessage} />}
           </div>
         </div>
       </div>

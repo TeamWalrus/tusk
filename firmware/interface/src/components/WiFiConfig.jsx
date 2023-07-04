@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
-import { postApiRequest, fetchApiRequest } from '../helpers/api';
+import { postApiRequest, fetchApiRequest } from "../helpers/api";
 
-export default function WiFiConfig({ tab, showToast, setError}) {
+export default function WiFiConfig({
+  currentTab,
+  showToastMessage,
+  setErrorMessage,
+}) {
   const wifi_config_tab = 2;
-  const opentab = tab;
+  const opentab = currentTab;
   const [wificonfig, setWiFiConfig] = useState([]);
   const form = useRef(null);
 
@@ -12,7 +16,7 @@ export default function WiFiConfig({ tab, showToast, setError}) {
       const response = await fetchApiRequest("/api/device/wificonfig");
       setWiFiConfig(response);
     } catch (error) {
-      setError("An error occurred while fetching the WiFi config.");
+      setErrorMessage("An error occurred while fetching the WiFi config.");
       console.error(error);
     }
   };
@@ -28,11 +32,11 @@ export default function WiFiConfig({ tab, showToast, setError}) {
     })
       .then((response) => response.text())
       .then((message) => {
-        showToast(message);
+        showToastMessage(message);
         postApiRequest("/api/device/reboot");
       })
       .catch((error) => {
-        setError(
+        setErrorMessage(
           "API Error - Check console logs for additional information."
         );
         console.error(error);
@@ -93,8 +97,8 @@ export default function WiFiConfig({ tab, showToast, setError}) {
               id="hidessid"
               name="hidessid"
               type="checkbox"
-              className={`toggle-success toggle ${wificonfig.hidessid === "0" ? "" : "defaultChecked"}`}
-              //checked={Boolean(config.hidessid)}
+              className="toggle-success toggle"
+              defaultChecked={Boolean(wificonfig.hidessid)}
             />
           </label>
           <button className="btn-success btn" value="submit">
