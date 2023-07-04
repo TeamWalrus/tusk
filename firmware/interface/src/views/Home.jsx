@@ -14,7 +14,7 @@ export default function Home() {
         <div className="form-control pt-4 sm:pt-0">
           <input
             type="text"
-            className="input-bordered input-primary input w-full px-2 text-center text-xs sm:w-auto md:text-sm lg:text-base"
+            className="input-bordered input-primary input w-full px-2 text-center text-sm sm:w-auto md:text-base"
             placeholder="Search Card Number"
             value={filter}
             onChange={(event) => setFilter(event.target.value)}

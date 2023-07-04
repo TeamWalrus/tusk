@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react";
 import formatBytes from "./FormatBytes";
 import { postApiRequest, fetchApiRequest } from "../helpers/api";
 
-export default function SDCardInfo({ currentTab, showToastMessage, setErrorMessage }) {
+export default function SDCardInfo({
+  currentTab,
+  showToastMessage,
+  setErrorMessage,
+}) {
   const sd_card_info_tab = 3;
   const opentab = currentTab;
   const [sdcardinfo, setSDCardInfo] = useState([]);
@@ -56,7 +60,35 @@ export default function SDCardInfo({ currentTab, showToastMessage, setErrorMessa
 
       <div className="container pt-6">
         <label htmlFor="confirm-delete-modal" className="btn-error btn">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="h-6 w-6 pr-px"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+            />
+          </svg>
           Delete All Cards
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="h-6 w-6 pl-px"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+            />
+          </svg>
         </label>
         <input
           type="checkbox"

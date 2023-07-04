@@ -69,12 +69,12 @@ export default function GeneralSettings({ currentTab, setErrorMessage }) {
       }`}
     >
       <div className="pb-2 text-center">
-        <span className="label-text pr-2">Version:</span>
-        <span className="text-sm">{deviceSettings.version}</span>
+        <span className="text-sm lg:text-base pr-2">Version:</span>
+        <span className="text-sm lg:text-base">{deviceSettings.version}</span>
       </div>
       <div className="form-control pb-2">
         <label className="label cursor-pointer">
-          <span className="label-text pr-2">Capture Data: </span>
+          <span className="text-sm lg:text-base pr-2">Capture Data: </span>
           <input
             id="toggleCapturing"
             name="toggleCapturing"

@@ -55,7 +55,7 @@ export default function WiFiConfig({
       <form ref={form} onSubmit={submitWiFiUpdate}>
         <div className="form-control w-full max-w-xs">
           <label className="label">
-            <span className="label-text">Name (SSID)</span>
+            <span className="label-text text-sm lg:text-base">Name (SSID)</span>
           </label>
           <input
             id="ssid"
@@ -67,7 +67,7 @@ export default function WiFiConfig({
             className="input-bordered input-primary input w-full max-w-xs"
           />
           <label className="label">
-            <span className="label-text">Password</span>
+            <span className="label-text text-sm lg:text-base">Password</span>
           </label>
           <input
             id="password"
@@ -80,7 +80,7 @@ export default function WiFiConfig({
             className="input-bordered input-primary input w-full max-w-xs"
           />
           <label className="label">
-            <span className="label-text">Channel</span>
+            <span className="label-text text-sm lg:text-base">Channel</span>
           </label>
           <input
             id="channel"
@@ -92,7 +92,7 @@ export default function WiFiConfig({
             className="input-bordered input-primary input w-full max-w-xs"
           />
           <label className="label cursor-pointer py-4">
-            <span className="label-text">Hide SSID</span>
+            <span className="label-text text-sm lg:text-base">Hide SSID</span>
             <input
               id="hidessid"
               name="hidessid"
