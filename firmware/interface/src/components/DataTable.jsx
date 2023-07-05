@@ -42,6 +42,7 @@ export default function DataTable({ filter }) {
           }, streamerr)
           .then((data) => {
             setCardData([...cardData, ...cardEntry]);
+            setError("");
           });
       })
       .catch((error) => {

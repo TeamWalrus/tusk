@@ -201,6 +201,22 @@ CardholderCredentials deobfuscate_cardholder_credentials(byte *bytes)
   return credentials;
 }
 
+void test_deobfuscate_cardholder_credentials(byte *input)
+{
+  // byte inputBytes[] = {0xA3, 0x8A, 0x8A, 0x4B, 0xA3, 0xA3, 0xA3, 0x2C};
+
+  CardholderCredentials credentials = deobfuscate_cardholder_credentials(input);
+
+  Serial.print("Region Code: ");
+  Serial.println(credentials.region_code);
+  Serial.print("Facility Code: ");
+  Serial.println(credentials.facility_code);
+  Serial.print("Card Number: ");
+  Serial.println(credentials.card_number);
+  Serial.print("Issue Level: ");
+  Serial.println(credentials.issue_level);
+}
+
 // Function to decode raw Gallagher cardax 125khz card data
 void decode_cardax_125khz(String data)
 {
@@ -273,6 +289,8 @@ void decode_cardax_125khz(String data)
     Serial.print(byteArr[i], HEX);
   }
   Serial.println();
+
+  test_deobfuscate_cardholder_credentials(byteArr);
 }
 
 // Print bits to serial (for debugging only)
@@ -344,6 +362,15 @@ void getCardNumAndSiteCode()
     cardType = "hid";
     facilityCode = decodeHIDFacilityCode(2, 14);
     cardCode = decodeHIDCardCode(14, 34);
+    break;
+
+  case 96:
+    cardType = "gallagher";
+    String databitsString = "";
+    for (unsigned int i = 0; i < bitCount; i++) {
+      databitsString += (databits[i] == 1 ? "1" : "0");
+    }
+    decode_cardax_125khz(databitsString);
     break;
   }
   return;
@@ -808,7 +835,7 @@ void loop() {
 
   } else {
     // not capturing data - do nothing
-    Serial.println("[!] Not capturing data");
+    Serial.println("[!] Tusk: Not capturing data");
     delay(60000);
   }
 }
