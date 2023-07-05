@@ -4,7 +4,6 @@ import { fetchApiRequest } from "../helpers/api";
 import { DeviceSettingsContext } from "./DeviceSettingsProvider";
 
 export default function GeneralSettings({ currentTab, setErrorMessage }) {
-  const general_settings = 1;
   const opentab = currentTab;
   const { deviceSettings, setDeviceSettings, getDeviceSettings } = useContext(
     DeviceSettingsContext
@@ -65,7 +64,7 @@ export default function GeneralSettings({ currentTab, setErrorMessage }) {
     <div
       id="tab_general_settings"
       className={`flex flex-col items-center ${
-        opentab === general_settings ? "block" : "hidden"
+        opentab === "general_settings" ? "block" : "hidden"
       }`}
     >
       <div className="pb-2 text-center">

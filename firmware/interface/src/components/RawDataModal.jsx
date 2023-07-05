@@ -1,26 +1,24 @@
 export default function RawDataModal({ index, raw }) {
+  const id = "rawdata_modal_" + index;
+  const openModal = () => {
+    const modal = document.getElementById(id);
+    if (modal) modal.showModal();
+  };
+
   return (
     <div>
-      <label
-        htmlFor={"rawdata_modal_" + index}
-        className="btn-info btn-outline btn-sm btn"
-      >
-        Show
-      </label>
-      <input
-        type="checkbox"
-        id={"rawdata_modal_" + index}
-        className="modal-toggle"
-      />
-      <div className="modal">
-        <div className="modal-box">
+      <button className="btn-info btn-outline btn-sm btn" onClick={openModal}>
+        show
+      </button>
+      <dialog id={id} className="modal">
+        <form method="dialog" className="modal-box">
           <h3 className="text-lg font-bold">Raw Data</h3>
-          <p className="py-4 font-mono">{raw}</p>
-        </div>
-        <label className="modal-backdrop" htmlFor={"rawdata_modal_" + index}>
-          Close
-        </label>
-      </div>
+          <p className="py-4 font-mono break-words overflow-auto">{raw}</p>
+        </form>
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
     </div>
   );
 }

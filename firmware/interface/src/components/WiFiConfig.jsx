@@ -6,7 +6,6 @@ export default function WiFiConfig({
   showToastMessage,
   setErrorMessage,
 }) {
-  const wifi_config_tab = 2;
   const opentab = currentTab;
   const [wificonfig, setWiFiConfig] = useState([]);
   const form = useRef(null);
@@ -50,7 +49,7 @@ export default function WiFiConfig({
   return (
     <div
       id="tab_wificonfig"
-      className={opentab === wifi_config_tab ? "block" : "hidden"}
+      className={opentab === "wifi_config" ? "block" : "hidden"}
     >
       <form ref={form} onSubmit={submitWiFiUpdate}>
         <div className="form-control w-full max-w-xs">

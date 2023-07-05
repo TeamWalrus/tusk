@@ -7,7 +7,6 @@ export default function SDCardInfo({
   showToastMessage,
   setErrorMessage,
 }) {
-  const sd_card_info_tab = 3;
   const opentab = currentTab;
   const [sdcardinfo, setSDCardInfo] = useState([]);
 
@@ -43,7 +42,7 @@ export default function SDCardInfo({
   return (
     <div
       id="tab_sdcardinfo"
-      className={opentab === sd_card_info_tab ? "block" : "hidden"}
+      className={opentab === "sd_card_info" ? "block" : "hidden"}
     >
       <div className="container">
         <div className="stats shadow">
@@ -59,7 +58,10 @@ export default function SDCardInfo({
       </div>
 
       <div className="container pt-6">
-        <label htmlFor="confirm-delete-modal" className="btn-error btn">
+        <button
+          className="btn-error btn"
+          onClick={() => window.confirm_delete_modal.showModal()}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -74,50 +76,30 @@ export default function SDCardInfo({
               d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
             />
           </svg>
-          Delete All Cards
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="h-6 w-6 pl-px"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
-            />
-          </svg>
-        </label>
-        <input
-          type="checkbox"
-          id="confirm-delete-modal"
-          className="checkbox-error modal-toggle"
-        />
-        <div className="modal">
-          <div className="modal-box">
-            <h3 className="text-lg font-bold">Delete All Card Data</h3>
+          Delete All Card Data
+        </button>
+        <dialog id="confirm_delete_modal" className="modal">
+          <form method="dialog" className="modal-box">
+            <h3 className="text-lg font-bold">
+              Delete All Card Data
+            </h3>
             <p className="py-4">
               All card data will be removed from the SD card!<br></br> This
               action cannot be undone.
             </p>
             <div className="modal-action flex justify-evenly">
-              <label htmlFor="confirm-delete-modal" className="btn-info btn">
-                Cancel
-              </label>
-              <label
-                htmlFor="confirm-delete-modal"
+              <button className="btn-info btn">Cancel</button>
+              <button
                 className="btn-error btn"
                 onClick={() => {
                   deleteCardData();
                 }}
               >
-                Delete
-              </label>
+                Confirm
+              </button>
             </div>
-          </div>
-        </div>
+          </form>
+        </dialog>
       </div>
     </div>
   );

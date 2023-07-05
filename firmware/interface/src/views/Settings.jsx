@@ -4,10 +4,9 @@ import SDCardInfo from "../components/SDCardInfo";
 import WiFiConfig from "../components/WiFiConfig";
 import GeneralSettings from "../components/GeneralSettings";
 import SettingsTabs from "../components/SettingsTabs";
-import { DeviceSettingsProvider } from "../components/DeviceSettingsProvider";
 
 export default function Settings() {
-  const [currentTab, setCurrentTab] = useState(1);
+  const [currentTab, setCurrentTab] = useState("general_settings");
   const [errorMessage, setErrorMessage] = useState("");
   const [toastMessage, setToastMessage] = useState("");
   const [toastTimeout, setToastTimeout] = useState(null);
