@@ -218,7 +218,7 @@ void test_deobfuscate_cardholder_credentials(byte *input)
 }
 
 // Function to decode raw Gallagher cardax 125khz card data
-void decode_cardax_125khz(String data)
+byte* decode_cardax_125khz(String data)
 {
   String magic_prefix = "01111111111010";
 
@@ -290,7 +290,8 @@ void decode_cardax_125khz(String data)
   }
   Serial.println();
 
-  test_deobfuscate_cardholder_credentials(byteArr);
+  return byteArr;
+  //test_deobfuscate_cardholder_credentials(byteArr);
 }
 
 // Print bits to serial (for debugging only)
@@ -366,11 +367,21 @@ void getCardNumAndSiteCode()
 
   case 96:
     cardType = "gallagher";
-    String databitsString = "";
+    String data = "";
     for (unsigned int i = 0; i < bitCount; i++) {
-      databitsString += (databits[i] == 1 ? "1" : "0");
+      data += String(databits[i]);
     }
-    decode_cardax_125khz(databitsString);
+    byte *raw = decode_cardax_125khz(data);
+    CardholderCredentials credentials = deobfuscate_cardholder_credentials(raw);
+    Serial.println("[!] Gallagher card details found");
+    Serial.print("Region Code: ");
+    Serial.println(credentials.region_code);
+    Serial.print("Facility Code: ");
+    Serial.println(credentials.facility_code);
+    Serial.print("Card Number: ");
+    Serial.println(credentials.card_number);
+    Serial.print("Issue Level: ");
+    Serial.println(credentials.issue_level);
     break;
   }
   return;
