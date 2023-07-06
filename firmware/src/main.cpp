@@ -9,14 +9,14 @@
 #include <SPI.h>
 #include <WiFi.h>
 
-// WiFi config
-// Variables to save values from HTML form
+// wifi config
+// variables to save values from HTML form
 String ssid;
 String password;
 String channel;
 String hidessid;
 
-// File paths on SD card to save wifi values permanently
+// file paths on SD card to save wifi values permanently
 const char *ssidPath = "/ssid.txt";
 const char *passwordPath = "/password.txt";
 const char *channelPath = "/channel.txt";
@@ -27,17 +27,17 @@ IPAddress local_ip(192, 168, 100, 1);
 IPAddress gateway(192, 168, 100, 1);
 IPAddress subnet(255, 255, 255, 0);
 
-// Define CS pin for the SD card module
+// define CS pin for the SD card module
 const int sd_cs = 5;
 
-// General device settings
+// general device settings
 bool isCapturing = true;
 String version = "0.1";
 
-// Webserver config /
+// webserver config /
 AsyncWebServer server(80);
 
-// Read File from SD Card
+// read file from SD Card
 String readSDFileLF(const char *path) {
   File file = SD.open(path);
   if (!file || file.isDirectory()) {
@@ -54,7 +54,7 @@ String readSDFileLF(const char *path) {
   file.close();
 }
 
-// Write file to SD Card
+// write file to SD Card
 void writeSDFile(const char *path, const char *message) {
   File file = SD.open(path, FILE_WRITE);
   if (!file) {
@@ -69,8 +69,7 @@ void writeSDFile(const char *path, const char *message) {
   file.close();
 }
 
-/* #####----- Card Reader Config -----##### */
-// Card Reader variables
+// card reader config and variables
 
 // max number of bits
 #define MAX_BITS 100
@@ -98,7 +97,7 @@ unsigned long facilityCode = 0;
 // decoded card code
 unsigned long cardCode = 0;
 
-// Breaking up card value into 2 chunks to create 10 char HEX value
+// breaking up card value into 2 chunks to create 10 char HEX value
 volatile unsigned long bitHolder1 = 0;
 volatile unsigned long bitHolder2 = 0;
 unsigned long cardChunk1 = 0;
@@ -110,7 +109,7 @@ unsigned long cardChunk2 = 0;
 // card reader DATA1
 #define DATA1 33
 
-/* #####----- Process interupts -----##### */
+// process interupts
 // interrupt that happens when INT0 goes low (0 bit)
 void ISR_INT0() {
   bitCount++;
@@ -143,7 +142,7 @@ void ISR_INT1() {
   weigandCounter = WEIGAND_WAIT_TIME;
 }
 
-// Gallagher cardholder credential data structure
+// gallagher cardholder credential data structure
 struct CardholderCredentials
 {
   int region_code;
@@ -152,7 +151,7 @@ struct CardholderCredentials
   int issue_level;
 };
 
-// Gallagher descramble function to deobfuscate card data
+// gallagher descramble function to deobfuscate card data
 byte descramble(byte arr)
 {
   byte lut[] = {
@@ -176,7 +175,7 @@ byte descramble(byte arr)
   return lut[arr];
 }
 
-// Function to deobfuscate Gallagher cardholder credentials
+// deobfuscate Gallagher cardholder credentials
 CardholderCredentials deobfuscate_cardholder_credentials(byte *bytes)
 {
   byte *arr = new byte[8];
@@ -201,7 +200,7 @@ CardholderCredentials deobfuscate_cardholder_credentials(byte *bytes)
   return credentials;
 }
 
-// Function to decode raw Gallagher cardax 125khz card data
+// decode raw Gallagher cardax 125khz card data
 void decode_cardax_125khz(String data)
 {
   String magic_prefix = "01111111111010";
@@ -275,11 +274,11 @@ void decode_cardax_125khz(String data)
   Serial.println();
 }
 
-// Print bits to serial (for debugging only)
+// print bits to serial (for debugging only)
 void printBits()
 {
-  if (bitCount >= 26)
-  { // ignore data caused by noise
+  // ignore data caused by noise
+  if (bitCount >= 26) {
     Serial.print("bit length: ");
     Serial.println(bitCount);
     Serial.println("facility code: ");
@@ -290,13 +289,11 @@ void printBits()
   }
 }
 
-// Process hid cards
-unsigned long decodeHIDFacilityCode(unsigned int start, unsigned int end)
-{
+// process hid cards
+unsigned long decodeHIDFacilityCode(unsigned int start, unsigned int end) {
   unsigned long HIDFacilityCode = 0;
   unsigned int i;
-  for (i = start; i < end; i++)
-  {
+  for (i = start; i < end; i++) {
     HIDFacilityCode = (HIDFacilityCode << 1) | databits[i];
   }
   return HIDFacilityCode;
@@ -349,8 +346,8 @@ void getCardNumAndSiteCode()
   return;
 }
 
-// Card value processing functions
-// Function to append the card value (bitHolder1 and bitHolder2) to the
+// card value processing functions
+// function to append the card value (bitHolder1 and bitHolder2) to the
 // necessary array then translate that to the two chunks for the card value that
 // will be output
 void setCardChunkBits(unsigned int cardChunk1Offset, unsigned int bitHolderOffset, unsigned int cardChunk2Offset) {
@@ -438,43 +435,53 @@ String prefixPad(const String &in, const char c, const size_t len) {
   return out;
 }
 
-/* #####----- Write to SD card -----##### */
+// write to SD card
 void writeSD() {
   File SDFile = SD.open("/cards.jsonl", FILE_APPEND);
   if (SDFile) {
-    if (bitCount >= 26) { // ignore data caused by noise
-      DynamicJsonDocument doc(512);
-      doc["card_type"] = cardType;
-      doc["bit_length"] = bitCount;
-      doc["facility_code"] = facilityCode;
-      doc["card_number"] = cardCode;
-      String hex =
-          String(cardChunk1, HEX) + prefixPad(String(cardChunk2, HEX), '0', 6);
-      doc["hex"] = hex;
-      String raw;
-      for (int i = 19; i >= 0; i--) {
-        raw = (bitRead(cardChunk1, i));
-      }
-      for (int i = 23; i >= 0; i--) {
-        raw += (bitRead(cardChunk2, i));
-      }
-      doc["raw"] = raw;
-      Serial.println("[+] New Card Read: ");
-      serializeJsonPretty(doc, Serial);
-      if (serializeJson(doc, SDFile) == 0) {
-        Serial.println("[-] SD Card: Failed to write json card data to file");
-      }
-      SDFile.print("\n");
-      SDFile.close();
-      Serial.println("[+] SD Card: Data Written to SD Card");
+    DynamicJsonDocument doc(512);
+    doc["card_type"] = cardType;
+    doc["bit_length"] = bitCount;
+    doc["facility_code"] = facilityCode;
+    doc["card_number"] = cardCode;
+    String hex =
+        String(cardChunk1, HEX) + prefixPad(String(cardChunk2, HEX), '0', 6);
+    doc["hex"] = hex;
+    String raw;
+    for (int i = 19; i >= 0; i--) {
+      raw = (bitRead(cardChunk1, i));
     }
+    for (int i = 23; i >= 0; i--) {
+      raw += (bitRead(cardChunk2, i));
+    }
+    doc["raw"] = raw;
+    Serial.println("[+] New Card Read: ");
+    serializeJsonPretty(doc, Serial);
+    if (serializeJson(doc, SDFile) == 0) {
+      Serial.println("[-] SD Card: Failed to write json card data to file");
+    }
+    SDFile.print("\n");
+    SDFile.close();
+    Serial.println("\n[+] SD Card: Data Written to SD Card");
   }
+}
+
+// cleanup and get ready for the next card
+void cleanup() {
+  cardType = "";
+  bitCount = 0;
+  facilityCode = 0;
+  cardCode = 0;
+  bitHolder1 = 0;
+  bitHolder2 = 0;
+  cardChunk1 = 0;
+  cardChunk2 = 0;
 }
 
 void setup() {
   Serial.begin(115200);
 
-  // Initialize SD card
+  // initialize SD card
   pinMode(sd_cs, OUTPUT);
   delay(3000);
   if (!SD.begin(sd_cs)) {
@@ -484,7 +491,7 @@ void setup() {
     Serial.println("[+] SD Card: Initialized successfully");
   }
 
-  // Initialize LittleFS
+  // initialize LittleFS
   delay(3000);
   if (!LittleFS.begin()) {
     Serial.println("[-] LittleFS: An error occurred while mounting");
@@ -514,14 +521,12 @@ void setup() {
   channel = readSDFileLF(channelPath);
   hidessid = readSDFileLF(hidessidPath);
 
-  // Initialize wifi
+  // initialize wifi
   WiFi.disconnect();
   WiFi.mode(WIFI_OFF);
   WiFi.mode(WIFI_AP);
   WiFi.softAPConfig(local_ip, gateway, subnet);
-  WiFi.softAP(ssid.c_str(), password.c_str(), channel.toInt(),
-              hidessid.toInt());
-
+  WiFi.softAP(ssid.c_str(), password.c_str(), channel.toInt(), hidessid.toInt());
   Serial.print("[+] WiFi: Creating access point: ");
   Serial.println(ssid);
   Serial.print("[+] WiFi: Gateway IP address: ");
@@ -536,13 +541,13 @@ void setup() {
   attachInterrupt(DATA1, ISR_INT1, FALLING);
   weigandCounter = WEIGAND_WAIT_TIME;
 
-  // Check for cards.jsonl on SD card
+  // check for cards.jsonl on SD card
   delay(3000);
   if (!SD.exists("/cards.jsonl")) {
     Serial.println("[-] SD Card: File cards.jsonl not found");
     Serial.println(
         "[*] SD Card: Created cards.jsonl and performing software reset");
-    // If file doesn't exist, create it
+    // if file doesn't exist, create it
     writeSDFile(jsoncarddataPath, "");
     Serial.println("[+] SD Card: File cards.jsonl created");
     Serial.println("[*] SD Card: Rebooting...");
@@ -782,24 +787,23 @@ void loop() {
         getCardNumAndSiteCode();
 
         printBits();
+        // check if card data is valid
+        if (bitCount >= 26 && (cardType == "hid" || cardType == "gallagher") &&
+            (facilityCode != 0 || cardCode != 0)) {
+          writeSD();
 
-        writeSD();
-
-        lastWrittenBitCount = bitCount;
-        for (i = 0; i < bitCount; i++) {
-          lastWrittenDatabits[i] = databits[i];
+          lastWrittenBitCount = bitCount;
+          for (i = 0; i < bitCount; i++)
+          {
+            lastWrittenDatabits[i] = databits[i];
+          }
+        } else {
+          Serial.println("[-] Invalid card data detected. Skipping writing to SD.");
         }
       }
 
       // cleanup and get ready for the next card
-      cardType = "";
-      bitCount = 0;
-      facilityCode = 0;
-      cardCode = 0;
-      bitHolder1 = 0;
-      bitHolder2 = 0;
-      cardChunk1 = 0;
-      cardChunk2 = 0;
+      cleanup();
 
       for (i = 0; i < MAX_BITS; i++) {
         databits[i] = 0;
