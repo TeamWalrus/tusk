@@ -482,9 +482,8 @@ void logRequest(const String &url) {
   Serial.println("[*] Webserver: Serving gzipped file: " + url + ".gz");
 }
 
-String getContentType(const String &url) {
-  int lastPeriodPos = url.lastIndexOf('.');
-  String extension = url.substring(lastPeriodPos + 1);
+String getUrlExtension(const String &url) {
+  String extension = url.substring(url.lastIndexOf('.') + 1);
 
   if (extension == "html" || extension == "htm")
     return "text/html";
@@ -665,7 +664,7 @@ void setupWebServer() {
 
   server.on("/assets/*", HTTP_GET, [](AsyncWebServerRequest *request) {
     String url = request->url();
-    String contentType = getContentType(url);
+    String contentType = getUrlExtension(url);
 
     handleGzippedFile(request, url.c_str(), contentType.c_str());
   });
