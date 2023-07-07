@@ -143,8 +143,7 @@ void ISR_INT1() {
 }
 
 // gallagher cardholder credential data structure
-struct CardholderCredentials
-{
+struct CardholderCredentials {
   int region_code;
   int facility_code;
   int card_number;
@@ -152,35 +151,38 @@ struct CardholderCredentials
 };
 
 // gallagher descramble function to deobfuscate card data
-byte descramble(byte arr)
-{
+byte descramble(byte arr) {
   byte lut[] = {
-      0x2f, 0x6e, 0xdd, 0xdf, 0x1d, 0x0f, 0xb0, 0x76, 0xad, 0xaf, 0x7f, 0xbb, 0x77, 0x85, 0x11, 0x6d,
-      0xf4, 0xd2, 0x84, 0x42, 0xeb, 0xf7, 0x34, 0x55, 0x4a, 0x3a, 0x10, 0x71, 0xe7, 0xa1, 0x62, 0x1a,
-      0x3e, 0x4c, 0x14, 0xd3, 0x5e, 0xb2, 0x7d, 0x56, 0xbc, 0x27, 0x82, 0x60, 0xe3, 0xae, 0x1f, 0x9b,
-      0xaa, 0x2b, 0x95, 0x49, 0x73, 0xe1, 0x92, 0x79, 0x91, 0x38, 0x6c, 0x19, 0x0e, 0xa9, 0xe2, 0x8d,
-      0x66, 0xc7, 0x5a, 0xf5, 0x1c, 0x80, 0x99, 0xbe, 0x4e, 0x41, 0xf0, 0xe8, 0xa6, 0x20, 0xab, 0x87,
-      0xc8, 0x1e, 0xa0, 0x59, 0x7b, 0x0c, 0xc3, 0x3c, 0x61, 0xcc, 0x40, 0x9e, 0x06, 0x52, 0x1b, 0x32,
-      0x8c, 0x12, 0x93, 0xbf, 0xef, 0x3b, 0x25, 0x0d, 0xc2, 0x88, 0xd1, 0xe0, 0x07, 0x2d, 0x70, 0xc6,
-      0x29, 0x6a, 0x4d, 0x47, 0x26, 0xa3, 0xe4, 0x8b, 0xf6, 0x97, 0x2c, 0x5d, 0x3d, 0xd7, 0x96, 0x28,
-      0x02, 0x08, 0x30, 0xa7, 0x22, 0xc9, 0x65, 0xf8, 0xb7, 0xb4, 0x8a, 0xca, 0xb9, 0xf2, 0xd0, 0x17,
-      0xff, 0x46, 0xfb, 0x9a, 0xba, 0x8f, 0xb6, 0x69, 0x68, 0x8e, 0x21, 0x6f, 0xc4, 0xcb, 0xb3, 0xce,
-      0x51, 0xd4, 0x81, 0x00, 0x2e, 0x9c, 0x74, 0x63, 0x45, 0xd9, 0x16, 0x35, 0x5f, 0xed, 0x78, 0x9f,
-      0x01, 0x48, 0x04, 0xc1, 0x33, 0xd6, 0x4f, 0x94, 0xde, 0x31, 0x9d, 0x0a, 0xac, 0x18, 0x4b, 0xcd,
-      0x98, 0xb8, 0x37, 0xa2, 0x83, 0xec, 0x03, 0xd8, 0xda, 0xe5, 0x7a, 0x6b, 0x53, 0xd5, 0x15, 0xa4,
-      0x43, 0xe9, 0x90, 0x67, 0x58, 0xc0, 0xa5, 0xfa, 0x2a, 0xb1, 0x75, 0x50, 0x39, 0x5c, 0xe6, 0xdc,
-      0x89, 0xfc, 0xcf, 0xfe, 0xf9, 0x57, 0x54, 0x64, 0xa8, 0xee, 0x23, 0x0b, 0xf1, 0xea, 0xfd, 0xdb,
-      0xbd, 0x09, 0xb5, 0x5b, 0x05, 0x86, 0x13, 0xf3, 0x24, 0xc5, 0x3f, 0x44, 0x72, 0x7c, 0x7e, 0x36};
+      0x2f, 0x6e, 0xdd, 0xdf, 0x1d, 0x0f, 0xb0, 0x76, 0xad, 0xaf, 0x7f, 0xbb,
+      0x77, 0x85, 0x11, 0x6d, 0xf4, 0xd2, 0x84, 0x42, 0xeb, 0xf7, 0x34, 0x55,
+      0x4a, 0x3a, 0x10, 0x71, 0xe7, 0xa1, 0x62, 0x1a, 0x3e, 0x4c, 0x14, 0xd3,
+      0x5e, 0xb2, 0x7d, 0x56, 0xbc, 0x27, 0x82, 0x60, 0xe3, 0xae, 0x1f, 0x9b,
+      0xaa, 0x2b, 0x95, 0x49, 0x73, 0xe1, 0x92, 0x79, 0x91, 0x38, 0x6c, 0x19,
+      0x0e, 0xa9, 0xe2, 0x8d, 0x66, 0xc7, 0x5a, 0xf5, 0x1c, 0x80, 0x99, 0xbe,
+      0x4e, 0x41, 0xf0, 0xe8, 0xa6, 0x20, 0xab, 0x87, 0xc8, 0x1e, 0xa0, 0x59,
+      0x7b, 0x0c, 0xc3, 0x3c, 0x61, 0xcc, 0x40, 0x9e, 0x06, 0x52, 0x1b, 0x32,
+      0x8c, 0x12, 0x93, 0xbf, 0xef, 0x3b, 0x25, 0x0d, 0xc2, 0x88, 0xd1, 0xe0,
+      0x07, 0x2d, 0x70, 0xc6, 0x29, 0x6a, 0x4d, 0x47, 0x26, 0xa3, 0xe4, 0x8b,
+      0xf6, 0x97, 0x2c, 0x5d, 0x3d, 0xd7, 0x96, 0x28, 0x02, 0x08, 0x30, 0xa7,
+      0x22, 0xc9, 0x65, 0xf8, 0xb7, 0xb4, 0x8a, 0xca, 0xb9, 0xf2, 0xd0, 0x17,
+      0xff, 0x46, 0xfb, 0x9a, 0xba, 0x8f, 0xb6, 0x69, 0x68, 0x8e, 0x21, 0x6f,
+      0xc4, 0xcb, 0xb3, 0xce, 0x51, 0xd4, 0x81, 0x00, 0x2e, 0x9c, 0x74, 0x63,
+      0x45, 0xd9, 0x16, 0x35, 0x5f, 0xed, 0x78, 0x9f, 0x01, 0x48, 0x04, 0xc1,
+      0x33, 0xd6, 0x4f, 0x94, 0xde, 0x31, 0x9d, 0x0a, 0xac, 0x18, 0x4b, 0xcd,
+      0x98, 0xb8, 0x37, 0xa2, 0x83, 0xec, 0x03, 0xd8, 0xda, 0xe5, 0x7a, 0x6b,
+      0x53, 0xd5, 0x15, 0xa4, 0x43, 0xe9, 0x90, 0x67, 0x58, 0xc0, 0xa5, 0xfa,
+      0x2a, 0xb1, 0x75, 0x50, 0x39, 0x5c, 0xe6, 0xdc, 0x89, 0xfc, 0xcf, 0xfe,
+      0xf9, 0x57, 0x54, 0x64, 0xa8, 0xee, 0x23, 0x0b, 0xf1, 0xea, 0xfd, 0xdb,
+      0xbd, 0x09, 0xb5, 0x5b, 0x05, 0x86, 0x13, 0xf3, 0x24, 0xc5, 0x3f, 0x44,
+      0x72, 0x7c, 0x7e, 0x36};
 
   return lut[arr];
 }
 
 // deobfuscate Gallagher cardholder credentials
-CardholderCredentials deobfuscate_cardholder_credentials(byte *bytes)
-{
+CardholderCredentials deobfuscate_cardholder_credentials(byte *bytes) {
   byte *arr = new byte[8];
-  for (int i = 0; i < 8; i++)
-  {
+  for (int i = 0; i < 8; i++) {
     arr[i] = descramble(bytes[i]);
   }
 
@@ -189,9 +191,11 @@ CardholderCredentials deobfuscate_cardholder_credentials(byte *bytes)
   // 4bit region code
   credentials.region_code = (arr[3] & 0x1E) >> 1;
   // 16bit facility code
-  credentials.facility_code = ((arr[5] & 0x0F) << 12) | (arr[1] << 4) | ((arr[7] >> 4) & 0x0F);
+  credentials.facility_code =
+      ((arr[5] & 0x0F) << 12) | (arr[1] << 4) | ((arr[7] >> 4) & 0x0F);
   // 24bit card number
-  credentials.card_number = (arr[0] << 16) | ((arr[4] & 0x1F) << 11) | (arr[2] << 3) | ((arr[3] & 0xE0) >> 5);
+  credentials.card_number = (arr[0] << 16) | ((arr[4] & 0x1F) << 11) |
+                            (arr[2] << 3) | ((arr[3] & 0xE0) >> 5);
   // 4bit issue level
   credentials.issue_level = (arr[7] & 0x0F);
 
@@ -201,33 +205,28 @@ CardholderCredentials deobfuscate_cardholder_credentials(byte *bytes)
 }
 
 // decode raw Gallagher cardax 125khz card data
-void decode_cardax_125khz(String data)
-{
+void decode_cardax_125khz(String data) {
   String magic_prefix = "01111111111010";
 
   int i = data.indexOf(magic_prefix);
-  if (i == -1)
-  {
-    Serial.println("Magic prefix not found - not a valid gallagher cardax card");
+  if (i == -1) {
+    Serial.println(
+        "Magic prefix not found - not a valid gallagher cardax card");
     return;
   }
 
   String b = "";
   data = data.substring(i + 16);
   data = data.substring(0, 9 * 8 + 8);
-  if (data.length() != 9 * 8 + 8)
-  {
+  if (data.length() != 9 * 8 + 8) {
     Serial.println("Invalid data length.");
     return;
   }
 
-  while (b.length() < 64 + 8)
-  {
+  while (b.length() < 64 + 8) {
     String n = data.substring(9 * b.length() / 8);
-    if (b.length() < 64)
-    {
-      if (n.charAt(7) == n.charAt(8))
-      {
+    if (b.length() < 64) {
+      if (n.charAt(7) == n.charAt(8)) {
         Serial.println("Invalid data!");
         return;
       }
@@ -261,22 +260,19 @@ void decode_cardax_125khz(String data)
   // Serial.println(hexStr);
 
   byte byteArr[8];
-  for (int i = 0; i < 8; i++)
-  {
+  for (int i = 0; i < 8; i++) {
     byteArr[i] = (n >> (56 - i * 8)) & 0xFF;
   }
 
   Serial.print("card data: ");
-  for (int i = 0; i < 8; i++)
-  {
+  for (int i = 0; i < 8; i++) {
     Serial.print(byteArr[i], HEX);
   }
   Serial.println();
 }
 
 // print bits to serial (for debugging only)
-void printBits()
-{
+void printBits() {
   // ignore data caused by noise
   if (bitCount >= 26) {
     Serial.print("bit length: ");
@@ -308,35 +304,33 @@ unsigned long decodeHIDCardCode(unsigned int start, unsigned int end) {
   return HIDCardCode;
 }
 
-void getCardNumAndSiteCode()
-{
+void getCardNumAndSiteCode() {
   // bits to be decoded differently depending on card format length
   // see http://www.pagemac.com/projects/rfid/hid_data_formats for more info
   // also specifically: www.brivo.com/app/static_data/js/calculate.js
-  switch (bitCount) 
-  {
-  // standard 26 bit format
+  switch (bitCount) {
+    // standard 26 bit format
   case 26:
     cardType = "hid";
     facilityCode = decodeHIDFacilityCode(1, 9);
     cardCode = decodeHIDCardCode(9, 25);
     break;
 
-  // 33 bit HID Generic
+    // 33 bit HID Generic
   case 33:
     cardType = "hid";
     facilityCode = decodeHIDFacilityCode(1, 8);
     cardCode = decodeHIDCardCode(8, 32);
     break;
 
-  // 34 bit HID Generic
+    // 34 bit HID Generic
   case 34:
     cardType = "hid";
     facilityCode = decodeHIDFacilityCode(1, 17);
     cardCode = decodeHIDCardCode(17, 33);
     break;
 
-  // 35 bit HID Corporate 1000 format
+    // 35 bit HID Corporate 1000 format
   case 35:
     cardType = "hid";
     facilityCode = decodeHIDFacilityCode(2, 14);
@@ -350,7 +344,9 @@ void getCardNumAndSiteCode()
 // function to append the card value (bitHolder1 and bitHolder2) to the
 // necessary array then translate that to the two chunks for the card value that
 // will be output
-void setCardChunkBits(unsigned int cardChunk1Offset, unsigned int bitHolderOffset, unsigned int cardChunk2Offset) {
+void setCardChunkBits(unsigned int cardChunk1Offset,
+                      unsigned int bitHolderOffset,
+                      unsigned int cardChunk2Offset) {
   for (int i = 19; i >= 0; i--) {
     if (i == 13 || i == cardChunk1Offset) {
       bitWrite(cardChunk1, i, 1);
@@ -368,10 +364,8 @@ void setCardChunkBits(unsigned int cardChunk1Offset, unsigned int bitHolderOffse
   }
 }
 
-void getCardValues()
-{
-  switch (bitCount)
-  {
+void getCardValues() {
+  switch (bitCount) {
     // Example of full card value
     // |>   preamble   <| |>   Actual card value   <|
     // 000000100000000001 11 111000100000100100111000
@@ -438,28 +432,32 @@ String prefixPad(const String &in, const char c, const size_t len) {
 // write to SD card
 void writeSD() {
   File SDFile = SD.open("/cards.jsonl", FILE_APPEND);
-  if (SDFile) {
-    DynamicJsonDocument doc(512);
-    doc["card_type"] = cardType;
-    doc["bit_length"] = bitCount;
-    doc["facility_code"] = facilityCode;
-    doc["card_number"] = cardCode;
-    String hex =
-        String(cardChunk1, HEX) + prefixPad(String(cardChunk2, HEX), '0', 6);
-    doc["hex"] = hex;
-    String raw;
-    for (int i = 19; i >= 0; i--) {
-      raw = (bitRead(cardChunk1, i));
-    }
-    for (int i = 23; i >= 0; i--) {
-      raw += (bitRead(cardChunk2, i));
-    }
-    doc["raw"] = raw;
-    Serial.println("[+] New Card Read: ");
-    serializeJsonPretty(doc, Serial);
-    if (serializeJson(doc, SDFile) == 0) {
-      Serial.println("[-] SD Card: Failed to write json card data to file");
-    }
+  if (!SDFile) {
+    Serial.println("[-] SD Card: Failed to open file");
+    return;
+  }
+  String hex =
+      String(cardChunk1, HEX) + prefixPad(String(cardChunk2, HEX), '0', 6);
+  String raw;
+  for (int i = 19; i >= 0; i--) {
+    raw += (bitRead(cardChunk1, i));
+  }
+  for (int i = 23; i >= 0; i--) {
+    raw += (bitRead(cardChunk2, i));
+  }
+  DynamicJsonDocument doc(1024);
+  doc["card_type"] = cardType;
+  doc["bit_length"] = bitCount;
+  doc["facility_code"] = facilityCode;
+  doc["card_number"] = cardCode;
+  doc["hex"] = hex;
+  doc["raw"] = raw;
+  Serial.println("[+] New Card Read: ");
+  serializeJsonPretty(doc, Serial);
+
+  if (serializeJson(doc, SDFile) == 0) {
+    Serial.println("[-] SD Card: Failed to write json card data to file");
+  } else {
     SDFile.print("\n");
     SDFile.close();
     Serial.println("\n[+] SD Card: Data Written to SD Card");
@@ -476,6 +474,225 @@ void cleanup() {
   bitHolder2 = 0;
   cardChunk1 = 0;
   cardChunk2 = 0;
+}
+
+// webserver setup and config
+void logRequest(const String &url) {
+  Serial.println("[*] Webserver: Requested url: " + url);
+  Serial.println("[*] Webserver: Serving gzipped file: " + url + ".gz");
+}
+
+String getContentType(const String &url) {
+  int lastPeriodPos = url.lastIndexOf('.');
+  String extension = url.substring(lastPeriodPos + 1);
+
+  if (extension == "html" || extension == "htm")
+    return "text/html";
+  else if (extension == "css")
+    return "text/css";
+  else if (extension == "js")
+    return "text/javascript";
+  else if (extension == "json")
+    return "application/json";
+  else if (extension == "jpg" || extension == "jpeg")
+    return "image/jpeg";
+  else if (extension == "png")
+    return "image/png";
+  else if (extension == "svg")
+    return "image/svg+xml";
+  else
+    return "text/plain";
+}
+
+void handleGzippedFile(AsyncWebServerRequest *request, const String &url,
+                       const String &contentType) {
+  logRequest(url);
+  AsyncWebServerResponse *response =
+      request->beginResponse(LittleFS, url + ".gz", contentType);
+  response->addHeader("Content-Encoding", "gzip");
+  request->send(response);
+}
+
+void sendJsonResponse(AsyncWebServerRequest *request,
+                      DynamicJsonDocument &json) {
+  AsyncResponseStream *response =
+      request->beginResponseStream("application/json");
+  serializeJson(json, *response);
+  request->send(response);
+}
+
+void handleGeneralSettingsGet(AsyncWebServerRequest *request) {
+  DynamicJsonDocument json(200);
+  json["capturing"] = isCapturing;
+  json["version"] = version;
+  sendJsonResponse(request, json);
+}
+
+void handleGeneralSettingsPost(AsyncWebServerRequest *request) {
+  int params = request->params();
+  for (int i = 0; i < params; i++) {
+    AsyncWebParameter *p = request->getParam(i);
+    if (p->isPost()) {
+      if (p->name() == "capturing") {
+        String newCapturingState = p->value().c_str();
+        if (newCapturingState == "true") {
+          isCapturing = true;
+        } else if (newCapturingState == "false") {
+          isCapturing = false;
+        }
+      }
+      Serial.printf("[+] Webserver: FormData - [%s]: %s\n", p->name().c_str(),
+                    p->value().c_str());
+    }
+  }
+  request->send(200, "text/plain", "General settings updated");
+}
+
+void handleJsonFileResponse(AsyncWebServerRequest *request,
+                            const String &path) {
+  AsyncResponseStream *response =
+      request->beginResponseStream("application/json");
+  DynamicJsonDocument json(512);
+
+  if (path == "littlefsinfo") {
+    json["totalBytes"] = LittleFS.totalBytes();
+    json["usedBytes"] = LittleFS.usedBytes();
+  } else if (path == "sdcardinfo") {
+    json["totalBytes"] = SD.totalBytes();
+    json["usedBytes"] = SD.usedBytes();
+  }
+
+  serializeJson(json, *response);
+  request->send(response);
+}
+
+void handleCardDataGet(AsyncWebServerRequest *request) {
+  File SDFile = SD.open("/cards.jsonl", FILE_READ);
+  String cardData;
+
+  if (SDFile) {
+    while (SDFile.available()) {
+      cardData = SDFile.readString();
+    }
+    SDFile.close();
+  } else {
+    Serial.println("[-] SD Card: error opening json data");
+  }
+
+  AsyncWebServerResponse *response =
+      request->beginResponse(200, "application/x-ndjson", cardData);
+  request->send(response);
+}
+
+void handleCardDataPost(AsyncWebServerRequest *request) {
+  writeSDFile(jsoncarddataPath, "");
+  lastWrittenBitCount = 0;
+  for (unsigned char i = 0; i < MAX_BITS; i++) {
+    lastWrittenDatabits[i] = 0;
+  }
+
+  AsyncWebServerResponse *response =
+      request->beginResponse(200, "text/plain", "All card data deleted!");
+  request->send(response);
+}
+
+void handleWiFiConfigGet(AsyncWebServerRequest *request) {
+  AsyncResponseStream *response =
+      request->beginResponseStream("application/json");
+  DynamicJsonDocument json(512);
+  json["ssid"] = ssid;
+  json["password"] = password;
+  json["channel"] = channel;
+  json["hidessid"] = hidessid;
+  serializeJson(json, *response);
+  request->send(response);
+}
+
+void handleWifiConfigPost(AsyncWebServerRequest *request) {
+  int params = request->params();
+
+  for (int i = 0; i < params; i++) {
+    AsyncWebParameter *p = request->getParam(i);
+    if (p->isPost()) {
+      if (p->name() == "ssid") {
+        ssid = p->value().c_str();
+        writeSDFile(ssidPath, ssid.c_str());
+      }
+      if (p->name() == "password") {
+        password = p->value().c_str();
+        writeSDFile(passwordPath, password.c_str());
+      }
+      if (p->name() == "channel") {
+        channel = p->value().c_str();
+        writeSDFile(channelPath, channel.c_str());
+      }
+      if (p->name() == "hidessid") {
+        hidessid = p->value().c_str();
+        if (hidessid == "on") {
+          writeSDFile(hidessidPath, "1");
+        } else {
+          writeSDFile(hidessidPath, "0");
+        }
+      }
+      Serial.printf("[+] Webserver: FormData - [%s]: %s\n", p->name().c_str(),
+                    p->value().c_str());
+    }
+    request->send(200, "text/plain", "WiFi config updated. Rebooting now");
+  }
+}
+
+void handleReboot(AsyncWebServerRequest *request) {
+  AsyncWebServerResponse *response =
+      request->beginResponse(200, "text/plain", "Rebooting device");
+  request->send(response);
+  delay(5000);
+  Serial.println("[*] Rebooting...");
+  ESP.restart();
+}
+
+void setupWebServer() {
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+    handleGzippedFile(request, "/index.html", "text/html");
+  });
+
+  server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request) {
+    handleGzippedFile(request, "/favicon.ico", "image/png");
+  });
+
+  server.on("/settings", HTTP_GET, [](AsyncWebServerRequest *request) {
+    handleGzippedFile(request, "/index.html", "text/html");
+  });
+
+  server.on("/assets/*", HTTP_GET, [](AsyncWebServerRequest *request) {
+    String url = request->url();
+    String contentType = getContentType(url);
+
+    handleGzippedFile(request, url.c_str(), contentType.c_str());
+  });
+
+  server.on("/api/device/littlefsinfo", HTTP_GET,
+            [](AsyncWebServerRequest *request) {
+              handleJsonFileResponse(request, "littlefsinfo");
+            });
+
+  server.on("/api/device/sdcardinfo", HTTP_GET,
+            [](AsyncWebServerRequest *request) {
+              handleJsonFileResponse(request, "sdcardinfo");
+            });
+
+  server.on("/api/device/settings/general", HTTP_GET, handleGeneralSettingsGet);
+  server.on("/api/device/settings/general", HTTP_POST,
+            handleGeneralSettingsPost);
+
+  server.on("/api/carddata", HTTP_GET, handleCardDataGet);
+  server.on("/api/carddata", HTTP_POST, handleCardDataPost);
+
+  server.on("/api/device/wificonfig", HTTP_GET, handleWiFiConfigGet);
+  server.on("/api/device/wificonfig", HTTP_POST, handleWifiConfigPost);
+
+  server.on("/api/device/reboot", HTTP_POST, handleReboot);
+
+  server.onNotFound([](AsyncWebServerRequest *request) { request->send(404); });
 }
 
 void setup() {
@@ -513,7 +730,8 @@ void setup() {
     delay(3000);
     ESP.restart();
   } else {
-    Serial.println("[+] WiFi Config: Found ssid.txt - assuming remaining wifi config files exist >.>");
+    Serial.println("[+] WiFi Config: Found ssid.txt - assuming remaining wifi "
+                   "config files exist >.>");
   }
 
   ssid = readSDFileLF(ssidPath);
@@ -526,7 +744,8 @@ void setup() {
   WiFi.mode(WIFI_OFF);
   WiFi.mode(WIFI_AP);
   WiFi.softAPConfig(local_ip, gateway, subnet);
-  WiFi.softAP(ssid.c_str(), password.c_str(), channel.toInt(), hidessid.toInt());
+  WiFi.softAP(ssid.c_str(), password.c_str(), channel.toInt(),
+              hidessid.toInt());
   Serial.print("[+] WiFi: Creating access point: ");
   Serial.println(ssid);
   Serial.print("[+] WiFi: Gateway IP address: ");
@@ -557,199 +776,11 @@ void setup() {
     Serial.println("[+] SD Card: Found cards.jsonl");
   }
 
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    AsyncWebServerResponse *response =
-        request->beginResponse(LittleFS, "/index.html.gz", "text/html");
-    response->addHeader("Content-Encoding", "gzip");
-    request->send(response);
-  });
-
-  server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request) {
-    AsyncWebServerResponse *response =
-        request->beginResponse(LittleFS, "/favicon.ico", "image/png");
-    request->send(response); 
-  });
-
-  server.on("/settings", HTTP_GET, [](AsyncWebServerRequest *request) {
-    Serial.println("[*] Webserver: Serving file:  /index.html.gz");
-    AsyncWebServerResponse *response =
-        request->beginResponse(LittleFS, "/index.html.gz", "text/html");
-    response->addHeader("Content-Encoding", "gzip");
-    request->send(response);
-  });
-
-  server.on("/assets/*", HTTP_GET, [](AsyncWebServerRequest *request) {
-    String url = request->url();
-    String urlgz = url + ".gz";
-    Serial.println("[*] Webserver: Requested url: " + url);
-    Serial.println("[*] Webserver: Serving gzipped file: " + url);
-    String contentType = url.substring(url.length() - 3);
-    if (contentType == "tml" || contentType == "htm")
-      contentType = "text/html";
-    else if (contentType == "css")
-      contentType = "text/css";
-    else if (contentType == ".js")
-      contentType = "text/javascript";
-    else if (contentType == "son")
-      contentType = "application/json";
-    else if (contentType == "jpg" || contentType == "peg")
-      contentType = "image/jpeg";
-    else if (contentType == "png")
-      contentType = "image/png";
-    else if (contentType == "svg")
-      contentType = "image/svg+xml";
-    else
-      contentType = "text/plain";
-    AsyncWebServerResponse *response =
-        request->beginResponse(LittleFS, urlgz, contentType);
-    response->addHeader("Content-Encoding", "gzip");
-    request->send(response);
-  });
-
-  server.on("/api/device/littlefsinfo", HTTP_GET, [](AsyncWebServerRequest *request) {
-    AsyncResponseStream *response =
-        request->beginResponseStream("application/json");
-    DynamicJsonDocument json(512);
-    json["totalBytes"] = LittleFS.totalBytes();
-    json["usedBytes"] = LittleFS.usedBytes();
-    serializeJson(json, *response);
-    request->send(response);
-  });
-
-  server.on("/api/device/sdcardinfo", HTTP_GET, [](AsyncWebServerRequest *request) {
-    AsyncResponseStream *response =
-        request->beginResponseStream("application/json");
-    DynamicJsonDocument json(512);
-    json["totalBytes"] = SD.totalBytes();
-    json["usedBytes"] = SD.usedBytes();
-    serializeJson(json, *response);
-    request->send(response);
-  });
-
-  server.on("/api/carddata", HTTP_GET, [](AsyncWebServerRequest *request) {
-    File SDFile = SD.open("/cards.jsonl", FILE_READ);
-    String cardData;
-    if (SDFile) {
-      while (SDFile.available()) {
-        cardData = SDFile.readString();
-      }
-      SDFile.close();
-    } else {
-      Serial.println("[-] SD Card: error opening json data");
-    }
-    // Should we rather be streaming the json data?
-    // https://github.com/me-no-dev/ESPAsyncWebServer#arduinojson-advanced-response
-    AsyncWebServerResponse *response =
-        request->beginResponse(200, "application/x-ndjson", cardData);
-    request->send(response);
-  });
-
-  server.on("/api/carddata", HTTP_POST,
-            [](AsyncWebServerRequest *request) {
-              writeSDFile(jsoncarddataPath, "");
-              lastWrittenBitCount = 0;
-              for (unsigned char i = 0; i < MAX_BITS; i++) {
-                lastWrittenDatabits[i] = 0;
-              }
-              AsyncWebServerResponse *response =
-                  request->beginResponse(200, "text/plain", "All card data deleted!");
-              request->send(response);
-            });
-
-  server.on("/api/device/wificonfig", HTTP_GET,
-            [](AsyncWebServerRequest *request) {
-              AsyncResponseStream *response =
-                  request->beginResponseStream("application/json");
-              DynamicJsonDocument json(512);
-              json["ssid"] = ssid;
-              json["password"] = password;
-              json["channel"] = channel;
-              json["hidessid"] = hidessid;
-              serializeJson(json, *response);
-              request->send(response); 
-            });
-
-  server.on(
-      "/api/device/wificonfig", HTTP_POST, [](AsyncWebServerRequest *request) {
-        int params = request->params();
-        for (int i = 0; i < params; i++) {
-          AsyncWebParameter *p = request->getParam(i);
-          if (p->isPost()) {
-            if (p->name() == "ssid") {
-              ssid = p->value().c_str();
-              writeSDFile(ssidPath, ssid.c_str());
-            }
-            if (p->name() == "password") {
-              password = p->value().c_str();
-              writeSDFile(passwordPath, password.c_str());
-            }
-            if (p->name() == "channel") {
-              channel = p->value().c_str();
-              writeSDFile(channelPath, channel.c_str());
-            }
-            if (p->name() == "hidessid") {
-              hidessid = p->value().c_str();
-              if (hidessid == "on") {
-                writeSDFile(hidessidPath, "1");
-              } else {
-                writeSDFile(hidessidPath, "0");
-              }
-            }
-            Serial.printf("[+] Webserver: FormData - [%s]: %s\n", p->name().c_str(),
-                          p->value().c_str());
-          }
-        }
-        request->send(200, "text/plain", "WiFi config updated. Rebooting now");
-      });
-
-  server.on("/api/device/reboot", HTTP_POST, [](AsyncWebServerRequest *request) {
-      AsyncWebServerResponse *response =
-        request->beginResponse(200, "text/plain", "Rebooting device");
-      request->send(response);
-      delay(5000);
-      Serial.println("[*] Rebooting...");
-      ESP.restart(); 
-    });
-
-  server.on("/api/device/settings/general", HTTP_GET,
-            [](AsyncWebServerRequest *request)
-            {
-              AsyncResponseStream *response =
-                  request->beginResponseStream("application/json");
-              DynamicJsonDocument json(200);
-              json["capturing"] = isCapturing;
-              json["version"] = version;
-              serializeJson(json, *response);
-              request->send(response);
-            });
-
-  server.on(
-      "/api/device/settings/general", HTTP_POST, [](AsyncWebServerRequest *request)
-      {
-        int params = request->params();
-        for (int i = 0; i < params; i++) {
-          AsyncWebParameter *p = request->getParam(i);
-          if (p->isPost()) {
-            if (p->name() == "capturing") {
-              String newCapturingState = p->value().c_str();
-              if (newCapturingState == "true") {
-                isCapturing = true;
-              } else if (newCapturingState == "false") {
-                isCapturing = false;
-              }
-            }
-            Serial.printf("[+] Webserver: FormData - [%s]: %s\n", p->name().c_str(),
-                          p->value().c_str());
-          }
-        }
-      request->send(200, "text/plain", "General settings updated"); 
-      });
-
-  server.onNotFound([](AsyncWebServerRequest *request) { request->send(404); });
+  setupWebServer();
 
   server.begin();
   Serial.println("[+] Webserver: Started");
-  Serial.println("[*] Tusk is running");
+  Serial.println("[+] Tusk: is running");
 
   for (unsigned char i = 0; i < MAX_BITS; i++) {
     lastWrittenDatabits[i] = 0;
@@ -758,6 +789,8 @@ void setup() {
 
 void loop() {
   if (isCapturing) {
+
+    Serial.println("[+] Tusk: Capturing data");
 
     if (!flagDone) {
       if (--weigandCounter == 0)
@@ -793,12 +826,12 @@ void loop() {
           writeSD();
 
           lastWrittenBitCount = bitCount;
-          for (i = 0; i < bitCount; i++)
-          {
+          for (i = 0; i < bitCount; i++) {
             lastWrittenDatabits[i] = databits[i];
           }
         } else {
-          Serial.println("[-] Invalid card data detected. Skipping writing to SD.");
+          Serial.println(
+              "[-] Tusk: Invalid card data detected. Skipping writing to SD.");
         }
       }
 
@@ -809,10 +842,9 @@ void loop() {
         databits[i] = 0;
       }
     }
-
   } else {
     // not capturing data - do nothing
-    Serial.println("[!] Not capturing data");
+    Serial.println("[-] Tusk: Not capturing data");
     delay(60000);
   }
 }

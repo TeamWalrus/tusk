@@ -26,8 +26,6 @@ def buildWeb():
         copytree(buildPath, dataPath)
         for currentpath, folders, files in os.walk(dataPath):
             for file in files:
-                if file == "favicon.ico":
-                    continue
                 gzipFile(os.path.join(currentpath, file))
     finally:
         os.chdir("..")
