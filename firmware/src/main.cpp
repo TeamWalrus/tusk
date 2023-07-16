@@ -34,9 +34,6 @@ const int sd_cs = 5;
 bool isCapturing = true;
 String version = "0.1";
 
-// webserver config /
-AsyncWebServer server(80);
-
 // read file from SD Card
 String readSDFileLF(const char *path) {
   File file = SD.open(path);
@@ -477,6 +474,8 @@ void cleanup() {
 }
 
 // webserver setup and config
+AsyncWebServer server(80);
+
 void logRequest(const String &url) {
   Serial.println("[*] Webserver: Requested url: " + url);
   Serial.println("[*] Webserver: Serving gzipped file: " + url + ".gz");
