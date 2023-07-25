@@ -206,14 +206,7 @@ export default function DataTable({ filter }) {
                     <div className="text-sm font-semibold">Hex:</div>
                     <div className="text-sm uppercase pl-0.5">{item.hex}</div>
                   </div>
-                  <div
-                    className={
-                      "badge font-semibold uppercase " +
-                      (item.card_type === "hid"
-                        ? "bg-blue-700 text-white"
-                        : "bg-amber-500 text-black")
-                    }
-                  >
+                  <div className="badge font-semibold uppercase bg-blue-700 text-white">
                     {item.card_type}
                   </div>
                 </div>
