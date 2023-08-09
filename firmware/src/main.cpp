@@ -147,6 +147,181 @@ void ISR_INT1() {
   weigandCounter = WEIGAND_WAIT_TIME;
 }
 
+// Print bits to serial (for debugging only)
+void printCardData() {
+  // ranges for "valid" bitCount are a bit larger for debugging
+  if (bitCount > 20 && bitCount < 120) { // ignore data caused by noise
+    Serial.print("[*] Bit length: ");
+    Serial.println(bitCount);
+    Serial.print("[*] Facility code: ");
+    Serial.println(facilityCode);
+    Serial.print("[*] Card number: ");
+    Serial.println(cardNumber);
+    if (cardType == "gallagher") {
+      Serial.print("[*] Region Code: ");
+      Serial.println(regionCode);
+      Serial.print("[*] Issue Level: ");
+      Serial.println(issueLevel);
+    }
+    Serial.print("[*] Hex: ");
+    Serial.println(hexCardData);
+    Serial.print("[*] Raw: ");
+    Serial.println(rawCardData);
+  }
+}
+
+// Process hid cards
+unsigned long decodeHIDFacilityCode(unsigned int start, unsigned int end) {
+  unsigned long HIDFacilityCode = 0;
+  for (unsigned int i = start; i < end; i++) {
+    HIDFacilityCode = (HIDFacilityCode << 1) | databits[i];
+  }
+  return HIDFacilityCode;
+}
+
+unsigned long decodeHIDCardCode(unsigned int start, unsigned int end) {
+  unsigned long HIDCardCode = 0;
+  for (unsigned int i = start; i < end; i++) {
+    HIDCardCode = (HIDCardCode << 1) | databits[i];
+  }
+  return HIDCardCode;
+}
+
+// Card value processing functions
+// Function to append the card value (bitHolder1 and bitHolder2) to the
+// necessary array then translate that to the two chunks for the card value that
+// will be output
+void setCardChunkBits(unsigned int cardChunk1Offset,
+                      unsigned int bitHolderOffset,
+                      unsigned int cardChunk2Offset) {
+  for (int i = 19; i >= 0; i--) {
+    if (i == 13 || i == cardChunk1Offset) {
+      bitWrite(cardChunk1, i, 1);
+    } else if (i > cardChunk1Offset) {
+      bitWrite(cardChunk1, i, 0);
+    } else {
+      bitWrite(cardChunk1, i, bitRead(bitHolder1, i + bitHolderOffset));
+    }
+    if (i < bitHolderOffset) {
+      bitWrite(cardChunk2, i + cardChunk2Offset, bitRead(bitHolder1, i));
+    }
+    if (i < cardChunk2Offset) {
+      bitWrite(cardChunk2, i, bitRead(bitHolder2, i));
+    }
+  }
+}
+
+String prefixPad(const String &in, const char c, const size_t len) {
+  String out = in;
+  while (out.length() < len) {
+    out = c + out;
+  }
+  return out;
+}
+
+void processHIDCard() {
+  // bits to be decoded differently depending on card format length
+  // see http://www.pagemac.com/projects/rfid/hid_data_formats for more info
+  // also specifically: www.brivo.com/app/static_data/js/calculate.js
+  // Example of full card value
+  // |>   preamble   <| |>   Actual card value   <|
+  // 000000100000000001 11 111000100000100100111000
+  // |> write to chunk1 <| |>  write to chunk2   <|
+  cardType = "hid";
+
+  unsigned int cardChunk1Offset, bitHolderOffset, cardChunk2Offset;
+
+  switch (bitCount) {
+  case 26:
+    facilityCode = decodeHIDFacilityCode(1, 9);
+    cardNumber = decodeHIDCardCode(9, 25);
+    cardChunk1Offset = 2;
+    bitHolderOffset = 20;
+    cardChunk2Offset = 4;
+    break;
+
+  case 27:
+    facilityCode = decodeHIDFacilityCode(1, 13);
+    cardNumber = decodeHIDCardCode(13, 27);
+    cardChunk1Offset = 3;
+    bitHolderOffset = 19;
+    cardChunk2Offset = 5;
+    break;
+
+  case 29:
+    facilityCode = decodeHIDFacilityCode(1, 13);
+    cardNumber = decodeHIDCardCode(13, 29);
+    cardChunk1Offset = 5;
+    bitHolderOffset = 17;
+    cardChunk2Offset = 7;
+    break;
+
+  case 30:
+    facilityCode = decodeHIDFacilityCode(1, 13);
+    cardNumber = decodeHIDCardCode(13, 29);
+    cardChunk1Offset = 6;
+    bitHolderOffset = 16;
+    cardChunk2Offset = 8;
+    break;
+
+  case 31:
+    facilityCode = decodeHIDFacilityCode(1, 5);
+    cardNumber = decodeHIDCardCode(5, 28);
+    cardChunk1Offset = 7;
+    bitHolderOffset = 15;
+    cardChunk2Offset = 9;
+    break;
+
+  case 32:
+    facilityCode = decodeHIDFacilityCode(1, 13);
+    cardNumber = decodeHIDCardCode(13, 31);
+    cardChunk1Offset = 8;
+    bitHolderOffset = 14;
+    cardChunk2Offset = 10;
+    break;
+
+  case 33:
+    facilityCode = decodeHIDFacilityCode(1, 8);
+    cardNumber = decodeHIDCardCode(8, 32);
+    cardChunk1Offset = 9;
+    bitHolderOffset = 13;
+    cardChunk2Offset = 11;
+    break;
+
+  case 34:
+    facilityCode = decodeHIDFacilityCode(1, 17);
+    cardNumber = decodeHIDCardCode(17, 33);
+    cardChunk1Offset = 10;
+    bitHolderOffset = 12;
+    cardChunk2Offset = 12;
+    break;
+
+  case 35:
+    facilityCode = decodeHIDFacilityCode(2, 14);
+    cardNumber = decodeHIDCardCode(14, 34);
+    cardChunk1Offset = 11;
+    bitHolderOffset = 11;
+    cardChunk2Offset = 13;
+    break;
+
+  case 36:
+    facilityCode = decodeHIDFacilityCode(21, 33);
+    cardNumber = decodeHIDCardCode(1, 17);
+    cardChunk1Offset = 12;
+    bitHolderOffset = 10;
+    cardChunk2Offset = 14;
+    break;
+
+  default:
+    Serial.println("[-] Unsupported bitCount for HID card");
+    return;
+  }
+
+  setCardChunkBits(cardChunk1Offset, bitHolderOffset, cardChunk2Offset);
+  hexCardData =
+      String(cardChunk1, HEX) + prefixPad(String(cardChunk2, HEX), '0', 6);
+}
+
 // gallagher cardholder credential data structure
 struct CardholderCredentials {
   int region_code;
@@ -186,7 +361,7 @@ byte descramble(byte arr) {
 
 // deobfuscate Gallagher cardholder credentials
 CardholderCredentials deobfuscate_cardholder_credentials(byte *bytes) {
-  byte *arr = new byte[8];
+  byte arr[8];
   for (int i = 0; i < 8; i++) {
     arr[i] = descramble(bytes[i]);
   }
@@ -202,8 +377,6 @@ CardholderCredentials deobfuscate_cardholder_credentials(byte *bytes) {
                             (arr[2] << 3) | ((arr[3] & 0xE0) >> 5);
   // 4bit issue level
   credentials.issue_level = (arr[7] & 0x0F);
-
-  delete[] arr;
 
   return credentials;
 }
@@ -270,267 +443,78 @@ byte *decode_cardax_125khz(String data) {
   for (int i = 0; i < 8; i++) {
     byteArr[i] = (n >> (56 - i * 8)) & 0xFF;
   }
-  
+
   return byteArr;
 }
 
-// Print bits to serial (for debugging only)
-void printBits() {
-  if (bitCount >= 26) { // ignore data caused by noise
-    Serial.print("[*] Bit length: ");
-    Serial.println(bitCount);
-    Serial.print("[*] Facility code: ");
-    Serial.println(facilityCode);
-    Serial.print("[*] Card number: ");
-    Serial.println(cardNumber);
-    if (cardType == "gallagher") {
-        Serial.print("[*] Region Code: ");
-        Serial.println(regionCode);
-        Serial.print("[*] Issue Level: ");
-        Serial.println(issueLevel);
+void processGallagherCard() {
+  cardType = "gallagher";
+  byte *hex = decode_cardax_125khz(rawCardData);
+  if (decodeError) {
+    Serial.println("[!] Error occurred during gallagher (cardax) decoding.");
+  } else {
+    for (int i = 0; i < 8; i++) {
+      hexCardData += String(hex[i], HEX);
     }
-    Serial.print("[*] Hex: ");
-    Serial.println(hexCardData);
-    Serial.print("[*] Raw: ");
-    Serial.println(rawCardData);
+    CardholderCredentials credentials = deobfuscate_cardholder_credentials(hex);
+    regionCode = credentials.region_code;
+    facilityCode = credentials.facility_code;
+    cardNumber = credentials.card_number;
+    issueLevel = credentials.issue_level;
   }
 }
 
-// Process hid cards
-unsigned long decodeHIDFacilityCode(unsigned int start, unsigned int end) {
-  unsigned long HIDFacilityCode = 0;
-  unsigned int i;
-  for (i = start; i < end; i++) {
-    HIDFacilityCode = (HIDFacilityCode << 1) | databits[i];
+void processCardData() {
+  rawCardData = "";
+  for (unsigned int i = 0; i < bitCount; i++) {
+    rawCardData += String(databits[i]);
   }
-  return HIDFacilityCode;
-}
 
-unsigned long decodeHIDCardCode(unsigned int start, unsigned int end) {
-  unsigned long HIDCardCode = 0;
-  unsigned int i;
-  for (i = start; i < end; i++) {
-    HIDCardCode = (HIDCardCode << 1) | databits[i];
+  if (bitCount >= 26 && bitCount <= 36) {
+    processHIDCard();
   }
-  return HIDCardCode;
-}
 
-// Card value processing functions
-// Function to append the card value (bitHolder1 and bitHolder2) to the
-// necessary array then translate that to the two chunks for the card value that
-// will be output
-void setCardChunkBits(unsigned int cardChunk1Offset,
-                      unsigned int bitHolderOffset,
-                      unsigned int cardChunk2Offset) {
-  for (int i = 19; i >= 0; i--) {
-    if (i == 13 || i == cardChunk1Offset) {
-      bitWrite(cardChunk1, i, 1);
-    } else if (i > cardChunk1Offset) {
-      bitWrite(cardChunk1, i, 0);
-    } else {
-      bitWrite(cardChunk1, i, bitRead(bitHolder1, i + bitHolderOffset));
-    }
-    if (i < bitHolderOffset) {
-      bitWrite(cardChunk2, i + cardChunk2Offset, bitRead(bitHolder1, i));
-    }
-    if (i < cardChunk2Offset) {
-      bitWrite(cardChunk2, i, bitRead(bitHolder2, i));
-    }
+  if (bitCount == 96) {
+    processGallagherCard();
   }
 }
 
-String prefixPad(const String &in, const char c, const size_t len) {
-  String out = in;
-  while (out.length() < len) {
-    out = c + out;
-  }
-  return out;
-}
+bool cardDataChanged() {
+  // check if the newly read card's bits are the same as the previously
+  // written card's bits
+  unsigned char i;
+  bool different = false;
 
-// bits to be decoded differently depending on card format length
-// see http://www.pagemac.com/projects/rfid/hid_data_formats for more info
-// also specifically: www.brivo.com/app/static_data/js/calculate.js
-// Example of full card value
-// |>   preamble   <| |>   Actual card value   <|
-// 000000100000000001 11 111000100000100100111000
-// |> write to chunk1 <| |>  write to chunk2   <|
-void processCard() {
-  String raw = "";
-  switch (bitCount) {
-  // standard 26 bit format
-  case 26:
-    cardType = "hid";
-    for (unsigned int i = 0; i < bitCount; i++) {
-      raw += String(databits[i]);
-    }
-    rawCardData = raw;
-    facilityCode = decodeHIDFacilityCode(1, 9);
-    cardNumber = decodeHIDCardCode(9, 25);
-    setCardChunkBits(2, 20, 4);
-    hexCardData = String(cardChunk1, HEX) + prefixPad(String(cardChunk2, HEX), '0', 6);
-    break;
-
-  // 27 bit INDALA
-  case 27:
-    cardType = "hid";
-    for (unsigned int i = 0; i < bitCount; i++) {
-      raw += String(databits[i]);
-    }
-    rawCardData = raw;
-    facilityCode = decodeHIDFacilityCode(1, 13);
-    cardNumber = decodeHIDCardCode(13, 27);
-    setCardChunkBits(3, 19, 5);
-    break;
-
-  // 29 bit INDALA
-  case 29:
-    cardType = "hid";
-    for (unsigned int i = 0; i < bitCount; i++) {
-      raw += String(databits[i]);
-    }
-    facilityCode = decodeHIDFacilityCode(1, 13);
-    cardNumber = decodeHIDCardCode(13, 29);
-    setCardChunkBits(5, 17, 7);
-    break;
-
-  case 30:
-    cardType = "hid";
-    for (unsigned int i = 0; i < bitCount; i++) {
-      raw += String(databits[i]);
-    }
-    rawCardData = raw;
-    facilityCode = decodeHIDFacilityCode(1, 13);
-    cardNumber = decodeHIDCardCode(13, 29);
-    setCardChunkBits(6, 16, 8);
-    break;
-
-  case 31:
-    cardType = "hid";
-    for (unsigned int i = 0; i < bitCount; i++) {
-      raw += String(databits[i]);
-    }
-    facilityCode = decodeHIDFacilityCode(1, 5);
-    cardNumber = decodeHIDCardCode(5, 28);
-    setCardChunkBits(7, 15, 9);
-    break;
-
-  case 32:
-    cardType = "hid";
-    for (unsigned int i = 0; i < bitCount; i++) {
-      raw += String(databits[i]);
-    }
-    facilityCode = decodeHIDFacilityCode(1, 13);
-    cardNumber = decodeHIDCardCode(13, 31);
-    setCardChunkBits(8, 14, 10);
-    break;
-  // 33 bit HID Generic
-  case 33:
-    cardType = "hid";
-    for (unsigned int i = 0; i < bitCount; i++) {
-      raw += String(databits[i]);
-    }
-    rawCardData = raw;
-    facilityCode = decodeHIDFacilityCode(1, 8);
-    cardNumber = decodeHIDCardCode(8, 32);
-    setCardChunkBits(9, 13, 11);
-    break;
-
-  // 34 bit HID Generic
-  case 34:
-    cardType = "hid";
-    for (unsigned int i = 0; i < bitCount; i++) {
-      raw += String(databits[i]);
-    }
-    rawCardData = raw;
-    facilityCode = decodeHIDFacilityCode(1, 17);
-    cardNumber = decodeHIDCardCode(17, 33);
-    setCardChunkBits(10, 12, 12);
-    break;
-
-  // 35 bit HID Corporate 1000 format
-  case 35:
-    cardType = "hid";
-    for (unsigned int i = 0; i < bitCount; i++) {
-      raw += String(databits[i]);
-    }
-    rawCardData = raw;
-    facilityCode = decodeHIDFacilityCode(2, 14);
-    cardNumber = decodeHIDCardCode(14, 34);
-    setCardChunkBits(11, 11, 13);
-    break;
-
-  //36 bit HID INNER RANGE
-  case 36:
-    cardType = "hid";
-    for (unsigned int i = 0; i < bitCount; i++) {
-      raw += String(databits[i]);
-    }
-    facilityCode = decodeHIDFacilityCode(21, 33);
-    cardNumber = decodeHIDCardCode(1, 17);
-    rawCardData = raw;
-    setCardChunkBits(12, 10, 14);
-    break;
-
-  case 96:
-    cardType = "gallagher";
-    for (unsigned int i = 0; i < bitCount; i++) {
-      raw += String(databits[i]);
-    }
-    rawCardData = raw;
-    byte *hex = decode_cardax_125khz(raw);
-    if (decodeError) {
-      Serial.println("[!] Error occurred during cardax decoding.");
-    } else {
-      Serial.print("[*] Hex: ");
-      for (int i = 0; i < 8; i++) {
-        Serial.print(hex[i], HEX);
-        hexCardData += String(hex[i], HEX);
+  if (bitCount == lastWrittenBitCount) {
+    for (i = 0; i < bitCount; i++) {
+      if (databits[i] != lastWrittenDatabits[i]) {
+        different = true;
+        break;
       }
-      Serial.println();
-      CardholderCredentials credentials = deobfuscate_cardholder_credentials(hex);
-      regionCode = credentials.region_code;
-      facilityCode = credentials.facility_code;
-      cardNumber = credentials.card_number;
-      issueLevel = credentials.issue_level;
     }
-    break;
+  } else {
+    different = true;
   }
-  return;
+
+  return different;
 }
 
-/* #####----- Write to SD card -----##### */
-void writeSD() {
-  File SDFile = SD.open("/cards.jsonl", FILE_APPEND);
-  if (SDFile) {
-    if (bitCount >= 26) { // ignore data caused by noise
-      DynamicJsonDocument doc(512);
-      doc["card_type"] = cardType;
-      doc["bit_length"] = bitCount;
-      doc["facility_code"] = facilityCode;
-      doc["card_number"] = cardNumber;
-      if (cardType == "hid") {
-        doc["hex"] = hexCardData;
-        doc["raw"] = rawCardData;
-      } else if (cardType == "gallagher") {
-        doc["issue_level"] = issueLevel;
-        doc["region_code"] = regionCode;
-        doc["raw"] = rawCardData;
-        doc["hex"] = hexCardData;
-      }
-      Serial.println("[+] New Card Read: ");
-      serializeJsonPretty(doc, Serial);
-      if (serializeJson(doc, SDFile) == 0) {
-        Serial.println("[-] SD Card: Failed to write json card data to file");
-      }
-      SDFile.print("\n");
-      SDFile.close();
-      Serial.println("[+] SD Card: Data Written to SD Card");
-    }
+void updateLastWrittenCardData() {
+  unsigned char i;
+  lastWrittenBitCount = bitCount;
+  for (i = 0; i < bitCount; i++) {
+    lastWrittenDatabits[i] = databits[i];
   }
 }
 
-// cleanup and get ready for the next card
-void cleanup() {
+void clearDatabits() {
+  for (unsigned char i = 0; i < MAX_BITS; i++) {
+    databits[i] = 0;
+  }
+}
+
+// reset variables and prepare for the next card read
+void cleanupCardData() {
   cardType = "";
   bitCount = 0;
   facilityCode = 0;
@@ -543,6 +527,32 @@ void cleanup() {
   bitHolder2 = 0;
   cardChunk1 = 0;
   cardChunk2 = 0;
+}
+
+/* #####----- Write to SD card -----##### */
+void writeToSD() {
+  File SDFile = SD.open("/cards.jsonl", FILE_APPEND);
+  if (SDFile) {
+    DynamicJsonDocument doc(1024);
+    doc["card_type"] = cardType;
+    doc["bit_length"] = bitCount;
+    doc["facility_code"] = facilityCode;
+    doc["card_number"] = cardNumber;
+    if (cardType == "gallagher") {
+      doc["issue_level"] = issueLevel;
+      doc["region_code"] = regionCode;
+    }
+    doc["raw"] = rawCardData;
+    doc["hex"] = hexCardData;
+    Serial.println("[+] New Card Read: ");
+    serializeJsonPretty(doc, Serial);
+    if (serializeJson(doc, SDFile) == 0) {
+      Serial.println("[-] SD Card: Failed to write json card data to file");
+    }
+    SDFile.print("\n");
+    SDFile.close();
+    Serial.println("\n[+] SD Card: Data Written to SD Card");
+  }
 }
 
 // webserver setup and config
@@ -860,8 +870,6 @@ void setup() {
 void loop() {
   if (isCapturing) {
 
-    // Serial.println("[+] Tusk: Capturing data");
-
     if (!flagDone) {
       if (--weigandCounter == 0)
         flagDone = 1;
@@ -869,47 +877,30 @@ void loop() {
 
     // if there are bits and the weigand counter went out
     if (bitCount > 0 && flagDone) {
-      unsigned char i;
 
-      // check if the newly read card's bits are the same as the previously
-      // written card's bits
-      bool same = true;
-      if (bitCount == lastWrittenBitCount) {
-        for (i = 0; i < bitCount; i++) {
-          if (databits[i] != lastWrittenDatabits[i]) {
-            same = false;
-            break;
-          }
-        }
-      } else {
-        same = false;
-      }
+      // Check if card data has changed
+      if (cardDataChanged()) {
+        processCardData();
+        printCardData();
 
-      if (!same) {
-        processCard();
-
-        printBits();
-        // check if card data is valid
-        if (bitCount >= 26 && (cardType == "hid" || cardType == "gallagher") &&
-            (facilityCode != 0 || cardNumber != 0)) {
-          writeSD();
-
-          lastWrittenBitCount = bitCount;
-          for (i = 0; i < bitCount; i++) {
-            lastWrittenDatabits[i] = databits[i];
+        // check if card data is valid before writing to SD card
+        // bitCount either within HID range or equal to Gallagher
+        if (bitCount >= 26 && bitCount <= 36 || bitCount == 96) {
+          if (facilityCode != 0 || cardNumber != 0) {
+            writeToSD();
+            updateLastWrittenCardData();
+          } else {
+            Serial.println("[-] Tusk: Invalid card data detected - blank "
+                           "facility code or card number");
           }
         } else {
-          Serial.println(
-              "[-] Tusk: Invalid card data detected. Skipping writing to SD.");
+          Serial.println("[-] Tusk: Invalid card data detected - bitCount not "
+                         "within valid range");
         }
       }
 
-      // cleanup and get ready for the next card
-      cleanup();
-
-      for (i = 0; i < MAX_BITS; i++) {
-        databits[i] = 0;
-      }
+      cleanupCardData();
+      clearDatabits();
     }
   } else {
     // not capturing data - do nothing
