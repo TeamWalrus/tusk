@@ -397,7 +397,7 @@ byte *decode_cardax_125khz(String data) {
   data = data.substring(i + 16);
   data = data.substring(0, 9 * 8 + 8);
   if (data.length() != 9 * 8 + 8) {
-    Serial.println("[!] Invalid data length.");
+    Serial.println("[!] Invalid gallagher card data length");
     decodeError = true;
     return nullptr;
   }
@@ -406,8 +406,9 @@ byte *decode_cardax_125khz(String data) {
     String n = data.substring(9 * b.length() / 8);
     if (b.length() < 64) {
       if (n.charAt(7) == n.charAt(8)) {
-        Serial.println("Invalid data!");
-        // TODO: this will cause crash - better way to handle this?
+        Serial.println("[!] Invalid gallagher data");
+        decodeError = true;
+        // TODO: this will cause esp32 to crash - is there a better way to handle this?
         return nullptr;
       }
     }
@@ -516,13 +517,13 @@ void clearDatabits() {
 // reset variables and prepare for the next card read
 void cleanupCardData() {
   cardType = "";
+  rawCardData = "";
+  hexCardData = "";
   bitCount = 0;
   facilityCode = 0;
   cardNumber = 0;
   regionCode = 0;
   issueLevel = 0;
-  rawCardData = "";
-  hexCardData = "";
   bitHolder1 = 0;
   bitHolder2 = 0;
   cardChunk1 = 0;
