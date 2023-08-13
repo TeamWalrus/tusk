@@ -224,8 +224,6 @@ String prefixPad(const String &in, const char c, const size_t len) {
   return out;
 }
 
-// use enum for cardType
-
 void processHIDCard() {
   // bits to be decoded differently depending on card format length
   // see http://www.pagemac.com/projects/rfid/hid_data_formats for more info
