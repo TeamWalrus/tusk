@@ -443,7 +443,7 @@ byte *decode_cardax_125khz(String data) {
     Serial.println("[-] Checksum did not match");
     decodeError = true;
     return nullptr;
-  } 
+  }
   */
 
   static byte byteArr[8];
