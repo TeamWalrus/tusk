@@ -184,12 +184,12 @@ unsigned long decodeHIDFacilityCode(unsigned int start, unsigned int end) {
   return HIDFacilityCode;
 }
 
-unsigned long decodeHIDCardCode(unsigned int start, unsigned int end) {
-  unsigned long HIDCardCode = 0;
+unsigned long decodeHIDCardNumber(unsigned int start, unsigned int end) {
+  unsigned long HIDCardNumber = 0;
   for (unsigned int i = start; i < end; i++) {
-    HIDCardCode = (HIDCardCode << 1) | databits[i];
+    HIDCardNumber = (HIDCardNumber << 1) | databits[i];
   }
-  return HIDCardCode;
+  return HIDCardNumber;
 }
 
 // Card value processing functions
@@ -239,7 +239,7 @@ void processHIDCard() {
   switch (bitCount) {
   case 26:
     facilityCode = decodeHIDFacilityCode(1, 9);
-    cardNumber = decodeHIDCardCode(9, 25);
+    cardNumber = decodeHIDCardNumber(9, 25);
     cardChunk1Offset = 2;
     bitHolderOffset = 20;
     cardChunk2Offset = 4;
@@ -247,7 +247,7 @@ void processHIDCard() {
 
   case 27:
     facilityCode = decodeHIDFacilityCode(1, 13);
-    cardNumber = decodeHIDCardCode(13, 27);
+    cardNumber = decodeHIDCardNumber(13, 27);
     cardChunk1Offset = 3;
     bitHolderOffset = 19;
     cardChunk2Offset = 5;
@@ -255,7 +255,7 @@ void processHIDCard() {
 
   case 29:
     facilityCode = decodeHIDFacilityCode(1, 13);
-    cardNumber = decodeHIDCardCode(13, 29);
+    cardNumber = decodeHIDCardNumber(13, 29);
     cardChunk1Offset = 5;
     bitHolderOffset = 17;
     cardChunk2Offset = 7;
@@ -263,7 +263,7 @@ void processHIDCard() {
 
   case 30:
     facilityCode = decodeHIDFacilityCode(1, 13);
-    cardNumber = decodeHIDCardCode(13, 29);
+    cardNumber = decodeHIDCardNumber(13, 29);
     cardChunk1Offset = 6;
     bitHolderOffset = 16;
     cardChunk2Offset = 8;
@@ -271,7 +271,7 @@ void processHIDCard() {
 
   case 31:
     facilityCode = decodeHIDFacilityCode(1, 5);
-    cardNumber = decodeHIDCardCode(5, 28);
+    cardNumber = decodeHIDCardNumber(5, 28);
     cardChunk1Offset = 7;
     bitHolderOffset = 15;
     cardChunk2Offset = 9;
@@ -279,7 +279,7 @@ void processHIDCard() {
 
   case 32:
     facilityCode = decodeHIDFacilityCode(1, 13);
-    cardNumber = decodeHIDCardCode(13, 31);
+    cardNumber = decodeHIDCardNumber(13, 31);
     cardChunk1Offset = 8;
     bitHolderOffset = 14;
     cardChunk2Offset = 10;
@@ -287,7 +287,7 @@ void processHIDCard() {
 
   case 33:
     facilityCode = decodeHIDFacilityCode(1, 8);
-    cardNumber = decodeHIDCardCode(8, 32);
+    cardNumber = decodeHIDCardNumber(8, 32);
     cardChunk1Offset = 9;
     bitHolderOffset = 13;
     cardChunk2Offset = 11;
@@ -295,7 +295,7 @@ void processHIDCard() {
 
   case 34:
     facilityCode = decodeHIDFacilityCode(1, 17);
-    cardNumber = decodeHIDCardCode(17, 33);
+    cardNumber = decodeHIDCardNumber(17, 33);
     cardChunk1Offset = 10;
     bitHolderOffset = 12;
     cardChunk2Offset = 12;
@@ -303,7 +303,7 @@ void processHIDCard() {
 
   case 35:
     facilityCode = decodeHIDFacilityCode(2, 14);
-    cardNumber = decodeHIDCardCode(14, 34);
+    cardNumber = decodeHIDCardNumber(14, 34);
     cardChunk1Offset = 11;
     bitHolderOffset = 11;
     cardChunk2Offset = 13;
@@ -311,7 +311,7 @@ void processHIDCard() {
 
   case 36:
     facilityCode = decodeHIDFacilityCode(21, 33);
-    cardNumber = decodeHIDCardCode(1, 17);
+    cardNumber = decodeHIDCardNumber(1, 17);
     cardChunk1Offset = 12;
     bitHolderOffset = 10;
     cardChunk2Offset = 14;
