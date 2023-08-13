@@ -87,7 +87,12 @@ volatile unsigned char flagDone;
 volatile unsigned int weigandCounter;
 
 // card type
-String cardType = "";
+enum CardType {
+  HID,
+  GALLAGHER,
+  UNKNOWN,
+};
+CardType cardType = UNKNOWN;
 
 // decoded facility code
 unsigned long facilityCode = 0;
@@ -157,7 +162,7 @@ void printCardData() {
     Serial.println(facilityCode);
     Serial.print("[*] Card number: ");
     Serial.println(cardNumber);
-    if (cardType == "gallagher") {
+    if (cardType == GALLAGHER) {
       Serial.print("[*] Region Code: ");
       Serial.println(regionCode);
       Serial.print("[*] Issue Level: ");
@@ -219,6 +224,8 @@ String prefixPad(const String &in, const char c, const size_t len) {
   return out;
 }
 
+// use enum for cardType
+
 void processHIDCard() {
   // bits to be decoded differently depending on card format length
   // see http://www.pagemac.com/projects/rfid/hid_data_formats for more info
@@ -227,7 +234,7 @@ void processHIDCard() {
   // |>   preamble   <| |>   Actual card value   <|
   // 000000100000000001 11 111000100000100100111000
   // |> write to chunk1 <| |>  write to chunk2   <|
-  cardType = "hid";
+  cardType = HID;
 
   unsigned int cardChunk1Offset, bitHolderOffset, cardChunk2Offset;
 
@@ -381,11 +388,12 @@ CardholderCredentials deobfuscate_cardholder_credentials(byte *bytes) {
   return credentials;
 }
 
-// Function to decode raw Gallagher cardax 125khz card data
-bool decodeError = false; //
+bool decodeError = false;
+// Function to decode raw Gallagher Cardax 125kHz card data
 byte *decode_cardax_125khz(String data) {
   String magic_prefix = "01111111111010";
   int i = data.indexOf(magic_prefix);
+
   if (i == -1) {
     Serial.println(
         "[!] Magic prefix not found - not a valid gallagher cardax card");
@@ -393,14 +401,16 @@ byte *decode_cardax_125khz(String data) {
     return nullptr;
   }
 
-  String b = "";
   data = data.substring(i + 16);
   data = data.substring(0, 9 * 8 + 8);
+
   if (data.length() != 9 * 8 + 8) {
     Serial.println("[!] Invalid gallagher card data length");
     decodeError = true;
     return nullptr;
   }
+
+  String b = "";
 
   while (b.length() < 64 + 8) {
     String n = data.substring(9 * b.length() / 8);
@@ -408,7 +418,6 @@ byte *decode_cardax_125khz(String data) {
       if (n.charAt(7) == n.charAt(8)) {
         Serial.println("[!] Invalid gallagher data");
         decodeError = true;
-        // TODO: this will cause esp32 to crash - is there a better way to handle this?
         return nullptr;
       }
     }
@@ -417,28 +426,27 @@ byte *decode_cardax_125khz(String data) {
 
   uint64_t n = strtoull(b.substring(0, 64).c_str(), NULL, 2);
 
-  // This always fails... not sure why
-  // byte check_sum = 0x2C;
-  // byte xcc[] = {0x7, 0xE, 0x1C, 0x38, 0x70, 0xE0, 0xC7, 0x89};
+  /*
+  TODO: the checksum always fails
+  byte check_sum = 0x2C;
+  byte xcc[] = {0x7, 0xE, 0x1C, 0x38, 0x70, 0xE0, 0xC7, 0x89};
 
-  // for (int c = 0; c < 8; c++) {
-  //   byte ncs = check_sum ^ ((byte*)&n)[c];
-  //   check_sum = 0;
-  //   for (int i = 0; i < 8; i++) {
-  //     if (ncs & (1 << i)) {
-  //       check_sum ^= xcc[i];
-  //     }
-  //   }
-  // }
+  for (int c = 0; c < 8; c++) {
+    byte ncs = check_sum ^ ((byte*)&n)[c];
+    check_sum = ncs;
+    for (int i = 0; i < 8; i++) {
+      if (ncs & (1 << i)) {
+        check_sum ^= xcc[i];
+      }
+    }
+  }
 
-  // if (strtoull(b.substring(0, 64).c_str(), NULL, 2) != check_sum) {
-  //   Serial.println("Checksum did not match.");
-  //   return;
-  // }
-
-  // char hexStr[17];
-  // sprintf(hexStr, "%016llX", n);
-  // Serial.println(hexStr);
+  if (strtoull(b.substring(0, 64).c_str(), NULL, 2) != check_sum) {
+    Serial.println("[-] Checksum did not match");
+    decodeError = true;
+    return nullptr;
+  } 
+  */
 
   static byte byteArr[8];
   for (int i = 0; i < 8; i++) {
@@ -449,7 +457,7 @@ byte *decode_cardax_125khz(String data) {
 }
 
 void processGallagherCard() {
-  cardType = "gallagher";
+  cardType = GALLAGHER;
   byte *hex = decode_cardax_125khz(rawCardData);
   if (decodeError) {
     Serial.println("[!] Error occurred during gallagher (cardax) decoding.");
@@ -516,7 +524,7 @@ void clearDatabits() {
 
 // reset variables and prepare for the next card read
 void cleanupCardData() {
-  cardType = "";
+  cardType = UNKNOWN;
   rawCardData = "";
   hexCardData = "";
   bitCount = 0;
@@ -539,7 +547,7 @@ void writeToSD() {
     doc["bit_length"] = bitCount;
     doc["facility_code"] = facilityCode;
     doc["card_number"] = cardNumber;
-    if (cardType == "gallagher") {
+    if (cardType == GALLAGHER) {
       doc["issue_level"] = issueLevel;
       doc["region_code"] = regionCode;
     }
