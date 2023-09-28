@@ -94,6 +94,19 @@ enum CardType {
 };
 CardType cardType = UNKNOWN;
 
+const char* cardTypeToString(CardType cardType) {
+  switch (cardType) {
+    case HID:
+      return "hid";
+    case GALLAGHER:
+      return "gallagher";
+    case UNKNOWN:
+      return "unknown";
+    default:
+      return "Invalid Card Type";
+  }
+}
+
 // decoded facility code
 unsigned long facilityCode = 0;
 // decoded card code
@@ -541,7 +554,7 @@ void writeToSD() {
   File SDFile = SD.open("/cards.jsonl", FILE_APPEND);
   if (SDFile) {
     DynamicJsonDocument doc(1024);
-    doc["card_type"] = cardType;
+    doc["card_type"] = cardTypeToString(cardType);
     doc["bit_length"] = bitCount;
     doc["facility_code"] = facilityCode;
     doc["card_number"] = cardNumber;
