@@ -8,6 +8,16 @@ The core functionality of the project remains the same: a tool that allows red t
 - HID Indala ASR-620 (125kHz Indala cards)
 - HID iCLASS R90 (13.56mHz iClass cards)
 
+## Legacy Operating Mode vs Future Operating Mode
+
+The project currently operates in "legacy mode", which is based on receiving card credentials from the `data0` and `data1` output pins on the Maxiprox reader. 
+
+This will eventually change and data will be sampled directly from the reader's microcontroller (pin `PD7` in the image below). The card sampling code is currently in another repo: https://github.com/TeamWalrus/tusk-sampler , and needs a few kinks ironed out. If you are interested in helping out, please check it out.
+
+![MC68HC705C8ACFNE-pinout](/images/MC68HC705C8ACFNE-pinout.jpg)
+
+Link for the MC68HC705C8ACFNE datasheet: https://www.allaboutcircuits.com/electronic-components/datasheet/MC68HC705C8ACFNE--NXP-Semiconductors/
+
 ## Overview of the upgrades
 
 | Component                  | Description                                                             |
@@ -35,13 +45,16 @@ The core functionality of the project remains the same: a tool that allows red t
 │   ├── scripts
 │   │   └── build_interface.py  # helper script to deploy react frontend to build path
 ├── hardware                    # gerber files, BOM, etc
-├── enclosure                   # enclosure files for 3d printing
 ```
 
 
 ## Build instructions: hardware
 
-Gerber files, BOM, and Pick and Place files required to get the PCB manufactured can be found in the `/hardware` directory. This is a PCB that houses the batteries for the long range reader, ESP32 microcontroller unit, and sd-card reader.
+Gerber files, Bill of Materials (BOM), and Pick and Place files required to get the PCB manufactured can be found in the `/hardware` directory. This is a PCB that houses the batteries for the long range reader, ESP32 microcontroller unit, and sd-card reader. Note - some parts are not in the BOM as they were purchased directly from aliexpress (non-affiliate links below):
+
+- ESP32-DevkitC-v4: https://www.aliexpress.com/item/4000090521976.html
+- Mini SD card reader module: https://www.aliexpress.com/item/1865616455.html
+- 21700 battery holder: https://www.aliexpress.com/item/1005003204083647.html
 
 The tusk PCB uses 5 x 27100 li-ion batteries slots that will power the long range reader. That means the output voltage is 4.2V x 5 = 21V. This should be within the operating voltage for the long range readers listed above. However, I recommend checking this before hooking up your reader.
 
@@ -53,6 +66,9 @@ Once the PCB is assembled:
 **Note**: the ESP32 footprint on the PCB is for an ESP32-DevKitC-V4. Older ESP32-DevKit-V1 will not fit.
 
 ![devkitv1-vs-devkitv4](/images/devkitv1-vs-devkitv4.jpg)
+
+![aliexpress-esp32-devkitc-v4](/images/aliexpress-esp32-devkitc-v4.jpg)
+
 
 ## Build instructions: firmware
 
@@ -79,7 +95,7 @@ Clients connect to the ESP32 over WiFi and view captured card credentials via a 
 | Component     | Details                |
 |:------------- |:---------------------- |
 | WiFi SSID     | `Tusk`                 |
-| WiFi Password | `changemepls`          |
+| WiFi Password | `changeme`             |
 | URL           | `http://192.168.100.1` |
 
 ## Acknowledgments
@@ -108,7 +124,3 @@ Captured card credentials are written to the sd card in newline-delimited JSON (
 {"card_type":"hid","bit_length":26,"facility_code":123,"card_number":123123,"hex":"AAAAAAA","raw":"0010101010010011000101010"}
 {"card_type":"gallagher","region_code":4,"bit_length":46,"facility_code":2222,"card_number":1111,"issue_level":3,"hex":"A38A8A4BA3A3A32C","raw":"101000110100010101100010101010010110101000110101000110101000110001011001"}
 ```
-
-## Enclosure
-
-3D printed enclosure files
