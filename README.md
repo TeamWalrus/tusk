@@ -8,16 +8,6 @@ The core functionality of the project remains the same: a tool that allows red t
 - HID Indala ASR-620 (125kHz Indala cards)
 - HID iCLASS R90 (13.56mHz iClass cards)
 
-## Legacy Operating Mode vs Future Operating Mode
-
-The project currently operates in "legacy mode", which is based on receiving card credentials from the `data0` and `data1` output pins on the Maxiprox reader. 
-
-This will eventually change and data will be sampled directly from the reader's microcontroller (pin `PD7` in the image below). The card sampling code is currently in another repo: https://github.com/TeamWalrus/tusk-sampler , and needs a few kinks ironed out. If you are interested in helping out, please check it out.
-
-![MC68HC705C8ACFNE-pinout](/images/MC68HC705C8ACFNE-pinout.png)
-
-Link for the MC68HC705C8ACFNE datasheet: https://www.allaboutcircuits.com/electronic-components/datasheet/MC68HC705C8ACFNE--NXP-Semiconductors/
-
 ## Overview of the upgrades
 
 | Component                  | Description                                                             |
@@ -97,6 +87,16 @@ Clients connect to the ESP32 over WiFi and view captured card credentials via a 
 | WiFi SSID     | `Tusk`                 |
 | WiFi Password | `changeme`             |
 | URL           | `http://192.168.100.1` |
+
+## Legacy Operating Mode vs Future Operating Mode
+
+The project currently operates in "legacy mode", which is based on receiving card credentials from the `data0` and `data1` output pins on the Maxiprox reader. 
+
+This will eventually change and data will be sampled directly from the reader's microcontroller (pin `PD7` in the image below). The card sampling code is currently in another repo: https://github.com/TeamWalrus/tusk-sampler , and needs a few kinks ironed out. If you are interested in helping out, please check it out.
+
+![MC68HC705C8ACFNE-pinout](/images/MC68HC705C8ACFNE-pinout.png)
+
+Link for the MC68HC705C8ACFNE datasheet: https://www.allaboutcircuits.com/electronic-components/datasheet/MC68HC705C8ACFNE--NXP-Semiconductors/
 
 ## Acknowledgments
 
