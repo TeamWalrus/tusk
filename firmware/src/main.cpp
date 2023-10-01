@@ -822,7 +822,7 @@ void setup() {
     Serial.println("[-] WiFi Config: ssid.txt file not found");
     // If file doesn't exist, create wifi config files
     writeSDFile(ssidPath, "Tusk");
-    writeSDFile(passwordPath, "12345678");
+    writeSDFile(passwordPath, "changeme");
     writeSDFile(channelPath, "1");
     writeSDFile(hidessidPath, "0");
     Serial.println("[+] WiFi Config: WiFi config files created");
