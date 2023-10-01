@@ -14,7 +14,7 @@ The project currently operates in "legacy mode", which is based on receiving car
 
 This will eventually change and data will be sampled directly from the reader's microcontroller (pin `PD7` in the image below). The card sampling code is currently in another repo: https://github.com/TeamWalrus/tusk-sampler , and needs a few kinks ironed out. If you are interested in helping out, please check it out.
 
-![MC68HC705C8ACFNE-pinout](/images/MC68HC705C8ACFNE-pinout.jpg)
+![MC68HC705C8ACFNE-pinout](/images/MC68HC705C8ACFNE-pinout.png)
 
 Link for the MC68HC705C8ACFNE datasheet: https://www.allaboutcircuits.com/electronic-components/datasheet/MC68HC705C8ACFNE--NXP-Semiconductors/
 
@@ -67,7 +67,7 @@ Once the PCB is assembled:
 
 ![devkitv1-vs-devkitv4](/images/devkitv1-vs-devkitv4.jpg)
 
-![aliexpress-esp32-devkitc-v4](/images/aliexpress-esp32-devkitc-v4.jpg)
+![aliexpress-esp32-devkitc-v4](/images/aliexpress-esp32-devkitc-v4.png)
 
 
 ## Build instructions: firmware
