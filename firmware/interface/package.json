@@ -20,7 +20,7 @@
     "@types/react-dom": "^18.2.7",
     "@vitejs/plugin-react": "^4.1.0",
     "autoprefixer": "^10.4.16",
-    "daisyui": "^3.7.7",
+    "daisyui": "^4.4.2",
     "postcss": "^8.4.30",
     "prettier": "^3.0.3",
     "prettier-plugin-tailwindcss": "^0.5.4",
