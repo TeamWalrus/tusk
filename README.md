@@ -98,6 +98,19 @@ This will eventually change and data will be sampled directly from the reader's 
 
 Link for the MC68HC705C8ACFNE datasheet: https://www.allaboutcircuits.com/electronic-components/datasheet/MC68HC705C8ACFNE--NXP-Semiconductors/
 
+
+## Debugging (thanks [@evildaemond](https://github.com/evildaemond))
+
+The `sdCommand(): Card Failed! cmd: 0x00` error appears when the Micro SD does not connect to the ESP32
+
+1. Check to make sure the Micro SD Card is installed
+1. Using the continuity test on a Multimeter, verify if all traces are soldered properly
+
+In the event of an error log which shows `sdcard_mount(): f_mount failed: (3) The physical drive cannot work`,
+
+1. Make sure your Micro SD Card is formatted to FAT32
+1. Check the Micro SD Card is suitable (Some forms of SanDisk SD cards such as the 32gb range will silently fail with this error)
+
 ## Acknowledgments
 
 It's important to acknowledge previous work done on this project:
