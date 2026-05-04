@@ -1,3 +1,7 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@plugin "daisyui" {
+  themes: night --default --prefersdark, cupcake;
+}
+
+@source "./**/*.{ts,tsx,html}";
